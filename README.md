@@ -234,7 +234,7 @@ Email notifications are optional. To enable:
 
 ## License
 
-ISC
+MIT
 
 ## Support
 
