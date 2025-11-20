@@ -7,7 +7,8 @@ const {
   updateOrder,
   cancelOrder,
   updateOrderStatus,
-  getAllOrders
+  getAllOrders,
+  updateOrderPaymentToggle
 } = require('../controllers/orderController');
 const { protect, authorize } = require('../middleware/auth');
 const { validateUpdateOrder, validateCancelOrder } = require('../middleware/orderValidation');
@@ -19,12 +20,12 @@ router.get('/my-orders', getMyOrders);
 router.get('/all', authorize('admin', 'vendor'), getAllOrders);
 router.get('/:id', getOrder);
 
-// New routes for edit and cancel
 router.put('/:id', validateUpdateOrder, updateOrder);
 router.put('/:id/cancel', validateCancelOrder, cancelOrder);
 
-// Existing routes
 router.put('/:id/status', authorize('admin', 'vendor'), updateOrderStatus);
 
-module.exports = router;
+// UPDATED: this replaces /pay fixed version
+router.put('/:id/pay', authorize('admin', 'vendor'), updateOrderPaymentToggle);
 
+module.exports = router;

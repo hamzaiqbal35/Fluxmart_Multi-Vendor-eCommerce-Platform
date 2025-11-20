@@ -18,7 +18,6 @@ const VendorDashboard = () => {
   const fetchProducts = async () => {
     try {
       const res = await api.get('/products');
-      // Filter products for current vendor
       const currentUser = JSON.parse(localStorage.getItem('user'));
       const vendorProducts = res.data.products.filter(p => 
         p.vendor._id === currentUser.id || p.vendor._id === currentUser._id
@@ -37,6 +36,16 @@ const VendorDashboard = () => {
       setOrders(res.data.orders);
     } catch (error) {
       console.error('Error fetching orders:', error);
+    }
+  };
+
+  // UPDATED: Payment toggle function
+  const handleTogglePayment = async (orderId) => {
+    try {
+      const { data } = await api.put(`/orders/${orderId}/pay`);
+      setOrders(orders.map((order) => (order._id === data._id ? data : order)));
+    } catch (error) {
+      console.error('Error toggling payment:', error);
     }
   };
 
@@ -151,6 +160,7 @@ const VendorDashboard = () => {
                         {order.status}
                       </span>
                     </div>
+
                     <div className="border-t pt-4">
                       {order.orderItems.map((item, idx) => (
                         <div key={idx} className="flex justify-between mb-2">
@@ -158,19 +168,32 @@ const VendorDashboard = () => {
                           <span>{formatPricePKR(item.price * item.quantity)}</span>
                         </div>
                       ))}
+
                       <div className="flex justify-between font-bold mt-2 pt-2 border-t">
                         <span>Total</span>
                         <span>{formatPricePKR(order.totalPrice)}</span>
                       </div>
 
-                      {/* View order button for vendor to open order details */}
-                      <div className="flex justify-end mt-4">
+                      <div className="flex justify-end mt-4 space-x-2">
+
+                        {order.status !== 'cancelled' && (
+                          <button
+                            onClick={() => handleTogglePayment(order._id)}
+                            className={`px-3 py-2 text-white rounded text-sm font-semibold 
+                              ${order.isPaid ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}`}
+                          >
+                            {order.isPaid ? 'Mark as Unpaid' : 'Mark as Paid'}
+                          </button>
+                        )}
+
+
                         <Link
                           to={`/orders/${order._id}`}
                           className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-semibold"
                         >
                           View Order
                         </Link>
+
                       </div>
                     </div>
                   </div>
@@ -187,4 +210,3 @@ const VendorDashboard = () => {
 };
 
 export default VendorDashboard;
-

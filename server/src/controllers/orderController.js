@@ -53,8 +53,8 @@ const createOrder = async (req, res) => {
     for (const vendorId in itemsByVendor) {
       const orderItems = itemsByVendor[vendorId];
       const orderItemsPrice = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      const shippingPrice = 10; // Fixed shipping price
-      const taxPrice = orderItemsPrice * 0.1; // 10% tax
+      const shippingPrice = 10;
+      const taxPrice = orderItemsPrice * 0.1;
       const totalPrice = orderItemsPrice + shippingPrice + taxPrice;
 
       const order = await Order.create({
@@ -79,11 +79,9 @@ const createOrder = async (req, res) => {
       orders.push(order);
     }
 
-    // Clear cart
     cart.items = [];
     await cart.save();
 
-    // Send confirmation email
     try {
       await sendOrderConfirmationEmail(req.user.email, orders);
     } catch (emailError) {
@@ -118,41 +116,31 @@ const getMyOrders = async (req, res) => {
   }
 };
 
-// @desc    Update order items (before shipping)
-// @route   PUT /api/orders/:id
-// @access  Private
+// @desc    Update order (customer updates items before shipping)
 const updateOrder = async (req, res) => {
   try {
     const { id } = req.params;
     const { orderItems } = req.body;
     const userId = req.user._id;
 
-    // Find order
-    const order = await Order.findById(id).populate('orderItems.product').populate('orderItems.vendor');
+    const order = await Order.findById(id)
+      .populate('orderItems.product')
+      .populate('orderItems.vendor');
     
-    if (!order) {
-      return res.status(404).json({ message: 'Order not found' });
-    }
+    if (!order) return res.status(404).json({ message: 'Order not found' });
 
-    // Check ownership
     if (order.user.toString() !== userId.toString()) {
       return res.status(403).json({ message: 'Not authorized to update this order' });
     }
 
-    // Check if order can be edited
     if (order.status !== 'pending') {
       return res.status(400).json({ message: 'Can only edit pending orders' });
     }
 
-    if (order.isPaid) {
-      return res.status(400).json({ message: 'Cannot edit paid orders' });
+    if (order.isPaid || order.isShipped) {
+      return res.status(400).json({ message: 'Cannot edit paid or shipped orders' });
     }
 
-    if (order.isShipped) {
-      return res.status(400).json({ message: 'Cannot edit shipped orders' });
-    }
-
-    // Validate order items
     if (!orderItems || orderItems.length === 0) {
       return res.status(400).json({ message: 'Order must contain at least one item' });
     }
@@ -162,12 +150,8 @@ const updateOrder = async (req, res) => {
 
     for (const item of orderItems) {
       const product = await Product.findById(item.product);
+      if (!product) return res.status(404).json({ message: `Product ${item.product} not found` });
 
-      if (!product) {
-        return res.status(404).json({ message: `Product ${item.product} not found` });
-      }
-
-      // Check stock
       if (item.quantity > product.stock) {
         return res.status(400).json({
           message: `Not enough stock for ${product.name}. Available: ${product.stock}`
@@ -190,12 +174,10 @@ const updateOrder = async (req, res) => {
       itemsPrice += product.price * item.quantity;
     }
 
-    // Calculate new totals
-    const taxPrice = itemsPrice * 0.1; // 10% tax
-    const shippingPrice = order.shippingPrice; // Keep same shipping
+    const taxPrice = itemsPrice * 0.1;
+    const shippingPrice = order.shippingPrice;
     const totalPrice = itemsPrice + taxPrice + shippingPrice;
 
-    // Update order
     order.orderItems = updatedOrderItems;
     order.itemsPrice = itemsPrice;
     order.taxPrice = taxPrice;
@@ -222,7 +204,6 @@ const cancelOrder = async (req, res) => {
     const { reason } = req.body;
     const userId = req.user._id;
 
-    // Find order
     const order = await Order.findById(id);
 
     if (!order) {
@@ -234,10 +215,10 @@ const cancelOrder = async (req, res) => {
       return res.status(403).json({ message: 'Not authorized to cancel this order' });
     }
 
-    // Check if order can be cancelled
+    // Only pending or processing can be cancelled
     if (!['pending', 'processing'].includes(order.status)) {
       return res.status(400).json({
-        message: `Cannot cancel ${order.status} orders. Only pending or processing orders can be cancelled.`
+        message: `Cannot cancel ${order.status} orders.`
       });
     }
 
@@ -245,7 +226,7 @@ const cancelOrder = async (req, res) => {
       return res.status(400).json({ message: 'Cannot cancel shipped orders' });
     }
 
-    // Restore product stock
+    // Restore stock
     for (const item of order.orderItems) {
       const product = await Product.findById(item.product);
       if (product) {
@@ -254,32 +235,34 @@ const cancelOrder = async (req, res) => {
       }
     }
 
-    // Update order
+    // MARK ORDER AS CANCELLED
     order.status = 'cancelled';
     order.cancellationReason = reason;
     order.cancelledAt = new Date();
 
-    // Process refund if already paid
+    // FORCE UNPAID ON CANCEL
     if (order.isPaid) {
       order.isRefunded = true;
       order.refundedAt = new Date();
     }
 
+    order.isPaid = false;       // <-- IMPORTANT
+    order.paidAt = null;        // <-- IMPORTANT
+
     await order.save();
 
     res.json({
       success: true,
-      message: 'Order cancelled successfully. Refund will be processed within 5-7 business days.',
+      message: 'Order cancelled successfully.',
       order
     });
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
 // @desc    Get single order
-// @route   GET /api/orders/:id
-// @access  Private
 const getOrder = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
@@ -287,15 +270,12 @@ const getOrder = async (req, res) => {
       .populate('orderItems.product', 'name images stock')
       .populate('orderItems.vendor', 'name email vendorInfo.businessName');
 
-    if (!order) {
-      return res.status(404).json({ message: 'Order not found' });
-    }
+    if (!order) return res.status(404).json({ message: 'Order not found' });
 
-    // Check if user is authorized
     if (order.user._id.toString() !== req.user._id.toString() && 
         req.user.role !== 'admin' && 
         !order.orderItems.some(item => item.vendor._id.toString() === req.user._id.toString())) {
-      return res.status(403).json({ message: 'Not authorized to view this order' });
+      return res.status(403).json({ message: 'Not authorized' });
     }
 
     res.json({
@@ -308,19 +288,14 @@ const getOrder = async (req, res) => {
 };
 
 // @desc    Update order status
-// @route   PUT /api/orders/:id/status
-// @access  Private/Vendor/Admin
 const updateOrderStatus = async (req, res) => {
   try {
     const { status, trackingNumber } = req.body;
     const order = await Order.findById(req.params.id)
       .populate('user', 'email name');
 
-    if (!order) {
-      return res.status(404).json({ message: 'Order not found' });
-    }
+    if (!order) return res.status(404).json({ message: 'Order not found' });
 
-    // Check authorization
     const isVendor = order.orderItems.some(
       item => item.vendor.toString() === req.user._id.toString()
     );
@@ -339,7 +314,6 @@ const updateOrderStatus = async (req, res) => {
 
     await order.save();
 
-    // Send status update email
     try {
       await sendOrderStatusUpdateEmail(order.user.email, order);
     } catch (emailError) {
@@ -355,14 +329,11 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
-// @desc    Get all orders (Admin/Vendor)
-// @route   GET /api/orders/all
-// @access  Private/Admin/Vendor
+// @desc    Get all orders
 const getAllOrders = async (req, res) => {
   try {
     let query = {};
 
-    // If vendor, only show their orders
     if (req.user.role === 'vendor') {
       query = { 'orderItems.vendor': req.user._id };
     }
@@ -382,6 +353,37 @@ const getAllOrders = async (req, res) => {
   }
 };
 
+const updateOrderPaymentToggle = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    // ADD THIS CHECK
+    if (order.status === 'cancelled') {
+      return res.status(400).json({ message: 'Cannot update payment status of cancelled orders' });
+    }
+
+    const isVendor = order.orderItems.some(
+      (item) => item.vendor.toString() === req.user._id.toString()
+    );
+
+    if (req.user.role !== 'admin' && !isVendor) {
+      return res.status(401).json({ message: 'Not authorized to update payment' });
+    }
+
+    order.isPaid = !order.isPaid;
+    order.paidAt = order.isPaid ? Date.now() : null;
+
+    const updatedOrder = await order.save();
+    res.json(updatedOrder);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createOrder,
   getMyOrders,
@@ -389,5 +391,6 @@ module.exports = {
   updateOrder,
   cancelOrder,
   updateOrderStatus,
-  getAllOrders
+  getAllOrders,
+  updateOrderPaymentToggle
 };
