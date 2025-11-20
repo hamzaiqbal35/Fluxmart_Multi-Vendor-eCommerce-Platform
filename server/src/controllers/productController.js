@@ -178,12 +178,33 @@ const addReview = async (req, res) => {
   }
 };
 
+// @desc    Upload product images
+// @route   POST /api/products/upload-images
+// @access  Private/Vendor
+const uploadImages = async (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: 'Please upload at least one image' });
+    }
+
+    // Generate URLs for uploaded images
+    const imageUrls = req.files.map(file => `/uploads/products/${file.filename}`);
+
+    res.json({
+      success: true,
+      images: imageUrls
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getProducts,
   getProduct,
   createProduct,
   updateProduct,
   deleteProduct,
-  addReview
+  addReview,
+  uploadImages
 };
-

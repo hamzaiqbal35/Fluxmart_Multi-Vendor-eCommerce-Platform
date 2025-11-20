@@ -11,7 +11,6 @@ const ensureDir = (dir) => {
 
 const avatarStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    // Save files under server/uploads/avatars so they are served by app.js
     const dir = path.join(__dirname, '..', '..', 'uploads', 'avatars');
     ensureDir(dir);
     cb(null, dir);
@@ -19,6 +18,20 @@ const avatarStorage = multer.diskStorage({
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
     cb(null, `${req.user._id}-${Date.now()}${ext}`);
+  }
+});
+
+// Storage configuration for product images
+const productStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const dir = path.join(__dirname, '..', '..', 'uploads', 'products');
+    ensureDir(dir);
+    cb(null, dir);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const uniqueName = `product-${req.user._id}-${Date.now()}-${Math.round(Math.random() * 1E9)}${ext}`;
+    cb(null, uniqueName);
   }
 });
 
@@ -35,8 +48,14 @@ const uploadAvatar = multer({
   limits: { fileSize: 2 * 1024 * 1024 } // 2MB
 });
 
+// Upload for product images - allows up to 5 images
+const uploadProductImages = multer({
+  storage: productStorage,
+  fileFilter: imageFileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB per image
+});
+
 module.exports = {
-  uploadAvatar
+  uploadAvatar,
+  uploadProductImages
 };
-
-

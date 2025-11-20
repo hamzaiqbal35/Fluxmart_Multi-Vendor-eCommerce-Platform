@@ -367,7 +367,7 @@ const OverviewTab = ({ stats }) => (
         value={stats.totalUsers}
         icon="👥"
         color="blue"
-        change="+12%"
+        change=""
       />
       <StatCard
         title="Total Vendors"

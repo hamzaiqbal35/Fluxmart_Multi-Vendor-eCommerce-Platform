@@ -8,6 +8,7 @@ const VendorProductForm = () => {
   const navigate = useNavigate();
   const isEdit = !!id;
   const [loading, setLoading] = useState(false);
+  const [uploadingImages, setUploadingImages] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -18,6 +19,8 @@ const VendorProductForm = () => {
     tags: '',
     isActive: true
   });
+  const [imageUrl, setImageUrl] = useState('');
+  const [selectedFiles, setSelectedFiles] = useState([]);
 
   useEffect(() => {
     if (isEdit) {
@@ -52,9 +55,63 @@ const VendorProductForm = () => {
     });
   };
 
-  const handleImageChange = (e) => {
-    const urls = e.target.value.split(',').map(url => url.trim()).filter(url => url);
-    setFormData({ ...formData, images: urls });
+  const handleAddImageUrl = () => {
+    if (imageUrl.trim()) {
+      setFormData({
+        ...formData,
+        images: [...formData.images, imageUrl.trim()]
+      });
+      setImageUrl('');
+    }
+  };
+
+  const handleRemoveImage = (index) => {
+    setFormData({
+      ...formData,
+      images: formData.images.filter((_, i) => i !== index)
+    });
+  };
+
+  const handleFileSelect = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length + formData.images.length > 5) {
+      alert('Maximum 5 images allowed');
+      return;
+    }
+    setSelectedFiles(files);
+  };
+
+  const handleUploadFiles = async () => {
+    if (selectedFiles.length === 0) return;
+
+    setUploadingImages(true);
+    try {
+      const formDataUpload = new FormData();
+      selectedFiles.forEach(file => {
+        formDataUpload.append('images', file);
+      });
+
+      const res = await api.post('/products/upload-images', formDataUpload, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      const uploadedUrls = res.data.images;
+      setFormData({
+        ...formData,
+        images: [...formData.images, ...uploadedUrls]
+      });
+      setSelectedFiles([]);
+      
+      // Reset file input
+      const fileInput = document.getElementById('file-upload');
+      if (fileInput) fileInput.value = '';
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to upload images');
+    } finally {
+      setUploadingImages(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -155,18 +212,62 @@ const VendorProductForm = () => {
             />
           </div>
 
-          <div>
-            <label className="block font-semibold mb-2">Image URLs (comma-separated)</label>
-            <input
-              type="text"
-              value={formData.images.join(', ')}
-              onChange={handleImageChange}
-              placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
-              className="w-full px-3 py-2 border rounded"
-            />
-            <p className="text-sm text-gray-500 mt-1">
-              Enter image URLs separated by commas
-            </p>
+          {/* Image Upload Section */}
+          <div className="border-t pt-6">
+            <label className="block font-semibold mb-4">Product Images (Max 5)</label>
+
+            {/* Add Image URL */}
+            <div className="mb-4 p-4 bg-gray-50 rounded">
+              <h3 className="font-medium mb-2">Add Image URL</h3>
+              <div className="flex gap-2">
+                <input
+                  type="url"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  placeholder="https://example.com/image.jpg"
+                  className="flex-1 px-3 py-2 border rounded"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddImageUrl}
+                  disabled={!imageUrl.trim()}
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+
+            {/* Display Current Images */}
+            {formData.images.length > 0 && (
+              <div>
+                <h3 className="font-medium mb-2">Current Images ({formData.images.length}/5)</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {formData.images.map((img, index) => (
+                    <div key={index} className="relative border rounded p-2">
+                      <img
+                        src={img.startsWith('http') ? img : `${api.defaults.baseURL}${img}`}
+                        alt={`Product ${index + 1}`}
+                        className="w-full h-32 object-cover rounded"
+                        onError={(e) => {
+                          e.target.src = 'https://via.placeholder.com/150?text=Image+Error';
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveImage(index)}
+                        className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-700"
+                      >
+                        ×
+                      </button>
+                      <p className="text-xs text-gray-500 mt-1 truncate">
+                        {img.startsWith('http') ? 'External URL' : 'Uploaded'}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <div>
@@ -217,4 +318,3 @@ const VendorProductForm = () => {
 };
 
 export default VendorProductForm;
-

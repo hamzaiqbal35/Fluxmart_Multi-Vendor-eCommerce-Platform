@@ -6,9 +6,11 @@ const {
   createProduct,
   updateProduct,
   deleteProduct,
-  addReview
+  addReview,
+  uploadImages
 } = require('../controllers/productController');
 const { protect, authorize } = require('../middleware/auth');
+const { uploadProductImages } = require('../middleware/upload');
 
 router.get('/', getProducts);
 router.get('/:id', getProduct);
@@ -17,5 +19,13 @@ router.put('/:id', protect, updateProduct);
 router.delete('/:id', protect, deleteProduct);
 router.post('/:id/reviews', protect, addReview);
 
-module.exports = router;
+// New route for uploading product images
+router.post(
+  '/upload-images',
+  protect,
+  authorize('vendor', 'admin'),
+  uploadProductImages.array('images', 5), // Allow up to 5 images
+  uploadImages
+);
 
+module.exports = router;
