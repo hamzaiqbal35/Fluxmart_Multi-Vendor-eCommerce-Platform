@@ -217,20 +217,6 @@ const Help = () => {
           <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">Quick Resources</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <a
-              href="/shipping"
-              className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-lg hover:shadow-lg transition-shadow duration-200 border border-blue-200"
-            >
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">📦 Shipping Info</h3>
-              <p className="text-gray-600">Learn about delivery times and shipping options</p>
-            </a>
-            <a
-              href="/returns"
-              className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-lg hover:shadow-lg transition-shadow duration-200 border border-green-200"
-            >
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">↩️ Returns & Refunds</h3>
-              <p className="text-gray-600">Understand our return policy and refund process</p>
-            </a>
-            <a
               href="/contact"
               className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-lg hover:shadow-lg transition-shadow duration-200 border border-purple-200"
             >

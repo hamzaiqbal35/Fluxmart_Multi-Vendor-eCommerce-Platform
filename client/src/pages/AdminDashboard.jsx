@@ -194,6 +194,32 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleToggleVendorStatus = async (vendorId, isActive) => {
+    const action = isActive ? 'Deactivate' : 'Activate';
+    if (!window.confirm(`Are you sure you want to ${action} this vendor?`)) return;
+
+    try {
+      await api.put(`/users/${vendorId}`, { isActive: !isActive });
+      alert(`Vendor ${action}d successfully!`);
+      fetchVendors();
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to update vendor status');
+    }
+  };
+
+  const handleDeleteVendor = async (vendorId) => {
+    if (!window.confirm('Are you sure you want to DELETE this vendor? This action is irreversible.')) return;
+
+    try {
+      await api.delete(`/users/${vendorId}`);
+      alert('Vendor deleted successfully');
+      fetchVendors();
+      fetchStats();
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to delete vendor');
+    }
+  };
+
   const handleToggleUserStatus = async (userId, isActive) => {
     try {
       await api.put(`/users/${userId}`, { isActive: !isActive });
@@ -310,6 +336,8 @@ const AdminDashboard = () => {
                     vendors={vendors}
                     onApprove={handleApproveVendor}
                     onDeny={handleDenyVendor}
+                    onToggleStatus={handleToggleVendorStatus}
+                    onDelete={handleDeleteVendor}
                     searchTerm={searchTerm}
                     onSearchChange={setSearchTerm}
                   />
@@ -429,7 +457,7 @@ const StatCard = ({ title, value, icon, color, change, badge }) => {
 };
 
 // Vendors Tab Component
-const VendorsTab = ({ vendors, onApprove, onDeny, searchTerm, onSearchChange }) => {
+const VendorsTab = ({ vendors, onApprove, onDeny, onToggleStatus, onDelete, searchTerm, onSearchChange }) => {
   const filteredVendors = vendors.filter(v =>
     v.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     v.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -441,6 +469,7 @@ const VendorsTab = ({ vendors, onApprove, onDeny, searchTerm, onSearchChange }) 
 
   return (
     <div>
+      {/* Search bar remains the same */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Vendor Management</h2>
         <input
@@ -452,6 +481,7 @@ const VendorsTab = ({ vendors, onApprove, onDeny, searchTerm, onSearchChange }) 
         />
       </div>
 
+      {/* Pending Vendors Section */}
       {pendingVendors.length > 0 && (
         <div className="mb-8">
           <h3 className="text-lg font-semibold mb-4 text-orange-600">
@@ -471,6 +501,7 @@ const VendorsTab = ({ vendors, onApprove, onDeny, searchTerm, onSearchChange }) 
         </div>
       )}
 
+      {/* Approved Vendors Section */}
       <div>
         <h3 className="text-lg font-semibold mb-4">All Vendors ({approvedVendors.length})</h3>
         {approvedVendors.length > 0 ? (
@@ -479,23 +510,24 @@ const VendorsTab = ({ vendors, onApprove, onDeny, searchTerm, onSearchChange }) 
               <VendorCard
                 key={vendor._id}
                 vendor={vendor}
-                onApprove={() => onApprove(vendor._id)}
-                onDeny={() => onDeny(vendor._id)}
+                onToggleStatus={() => onToggleStatus(vendor._id, vendor.isActive)}
+                onDelete={() => onDelete(vendor._id)}
                 isPending={false}
               />
             ))}
           </div>
         ) : (
-          <p className="text-gray-500">No vendors found</p>
+          <p className="text-gray-500">No approved vendors found</p>
         )}
       </div>
     </div>
   );
 };
 
-const VendorCard = ({ vendor, onApprove, onDeny, isPending }) => (
+const VendorCard = ({ vendor, onApprove, onDeny, isPending, onToggleStatus, onDelete }) => (
   <div className={`border rounded-lg p-4 ${isPending ? 'border-orange-300 bg-orange-50' : 'border-gray-200'}`}>
     <div className="flex justify-between items-start">
+      {/* Vendor info display remains the same */}
       <div className="flex-1">
         <div className="flex items-center space-x-3">
           <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
@@ -529,22 +561,43 @@ const VendorCard = ({ vendor, onApprove, onDeny, isPending }) => (
           </span>
         </div>
       </div>
-      {isPending && (
-        <div className="flex space-x-2 ml-4">
-          <button
-            onClick={onApprove}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-          >
-            Approve
-          </button>
-          <button
-            onClick={onDeny}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-          >
-            Deny
-          </button>
-        </div>
-      )}
+      
+      {/* Action Buttons */}
+      <div className="flex flex-col space-y-2 ml-4">
+        {isPending ? (
+          <>
+            <button
+              onClick={onApprove}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors w-full text-sm"
+            >
+              Approve
+            </button>
+            <button
+              onClick={onDeny}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors w-full text-sm"
+            >
+              Deny
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={onToggleStatus}
+              className={`px-4 py-2 rounded-lg text-white transition-colors w-full text-sm ${
+                vendor.isActive ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-green-600 hover:bg-green-700'}`
+              }
+            >
+              {vendor.isActive ? 'Deactivate' : 'Activate'}
+            </button>
+            <button
+              onClick={onDelete}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors w-full text-sm"
+            >
+              Delete
+            </button>
+          </>
+        )}
+      </div>
     </div>
   </div>
 );

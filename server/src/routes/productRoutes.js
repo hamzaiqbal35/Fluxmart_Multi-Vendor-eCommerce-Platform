@@ -10,20 +10,22 @@ const {
   uploadImages
 } = require('../controllers/productController');
 const { protect, authorize } = require('../middleware/auth');
+const { isVerifiedVendor } = require('../middleware/isVerifiedVendor');
 const { uploadProductImages } = require('../middleware/upload');
 
 router.get('/', getProducts);
 router.get('/:id', getProduct);
-router.post('/', protect, authorize('vendor', 'admin'), createProduct);
-router.put('/:id', protect, updateProduct);
-router.delete('/:id', protect, deleteProduct);
+router.post('/', protect, authorize('vendor'), isVerifiedVendor, createProduct);
+router.put('/:id', protect, authorize('vendor'), isVerifiedVendor, updateProduct);
+router.delete('/:id', protect, authorize('vendor'), isVerifiedVendor, deleteProduct);
 router.post('/:id/reviews', protect, addReview);
 
 // New route for uploading product images
 router.post(
   '/upload-images',
   protect,
-  authorize('vendor', 'admin'),
+  authorize('vendor'),
+  isVerifiedVendor,
   uploadProductImages.array('images', 5), // Allow up to 5 images
   uploadImages
 );
