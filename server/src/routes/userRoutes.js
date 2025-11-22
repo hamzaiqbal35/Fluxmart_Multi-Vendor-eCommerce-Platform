@@ -8,9 +8,21 @@ const { uploadAvatar } = require('../middleware/upload');
 router.get('/', protect, authorize('admin'), async (req, res) => {
   try {
     const users = await User.find().select('-password');
+    
+    // Add full avatar URL to each user
+    const usersWithAvatarUrl = users.map(user => {
+      const userObj = user.toObject();
+      if (userObj.avatar) {
+        // Remove any existing /uploads/avatars/ from the avatar path to prevent duplication
+        const cleanAvatarPath = userObj.avatar.replace(/^\/uploads\/avatars\//, '');
+        userObj.avatar = `${req.protocol}://${req.get('host')}/uploads/avatars/${cleanAvatarPath}`;
+      }
+      return userObj;
+    });
+    
     res.json({
       success: true,
-      users
+      users: usersWithAvatarUrl
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -21,9 +33,18 @@ router.get('/', protect, authorize('admin'), async (req, res) => {
 router.get('/me', protect, async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select('-password');
+    const userObj = user.toObject();
+    
+    // Add full avatar URL if avatar exists
+    if (userObj.avatar) {
+      // Remove any existing /uploads/avatars/ from the avatar path to prevent duplication
+      const cleanAvatarPath = userObj.avatar.replace(/^\/uploads\/avatars\//, '');
+      userObj.avatar = `${req.protocol}://${req.get('host')}/uploads/avatars/${cleanAvatarPath}`;
+    }
+    
     res.json({
       success: true,
-      user
+      user: userObj
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -37,9 +58,19 @@ router.get('/:id', protect, authorize('admin'), async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
+    
+    const userObj = user.toObject();
+    
+    // Add full avatar URL if avatar exists
+    if (userObj.avatar) {
+      // Remove any existing /uploads/avatars/ from the avatar path to prevent duplication
+      const cleanAvatarPath = userObj.avatar.replace(/^\/uploads\/avatars\//, '');
+      userObj.avatar = `${req.protocol}://${req.get('host')}/uploads/avatars/${cleanAvatarPath}`;
+    }
+    
     res.json({
       success: true,
-      user
+      user: userObj
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -221,12 +221,28 @@ const AdminDashboard = () => {
   };
 
   const handleToggleUserStatus = async (userId, isActive) => {
+    const action = isActive ? 'deactivate' : 'activate';
+    if (!window.confirm(`Are you sure you want to ${action} this user?`)) return;
+
     try {
       await api.put(`/users/${userId}`, { isActive: !isActive });
       fetchUsers();
-      fetchStats();
     } catch (error) {
-      alert(error.response?.data?.message || 'Failed to update user');
+      console.error('Error toggling user status:', error);
+      alert(error.response?.data?.message || 'Failed to update user status');
+    }
+  };
+
+  const handleDeleteUser = async (userId) => {
+    if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+      try {
+        await api.delete(`/users/${userId}`);
+        fetchUsers();
+        alert('User deleted successfully');
+      } catch (error) {
+        console.error('Error deleting user:', error);
+        alert(error.response?.data?.message || 'Failed to delete user');
+      }
     }
   };
 
@@ -346,6 +362,7 @@ const AdminDashboard = () => {
                   <UsersTab
                     users={users}
                     onToggleStatus={handleToggleUserStatus}
+                    onDelete={handleDeleteUser}
                     searchTerm={searchTerm}
                     onSearchChange={setSearchTerm}
                   />
@@ -530,8 +547,16 @@ const VendorCard = ({ vendor, onApprove, onDeny, isPending, onToggleStatus, onDe
       {/* Vendor info display remains the same */}
       <div className="flex-1">
         <div className="flex items-center space-x-3">
-          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
-            {vendor.name?.charAt(0).toUpperCase()}
+          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold overflow-hidden">
+            {vendor.avatar ? (
+              <img 
+                src={vendor.avatar} 
+                alt={vendor.name} 
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              vendor.name?.charAt(0).toUpperCase()
+            )}
           </div>
           <div>
             <h4 className="font-semibold text-lg">{vendor.name}</h4>
@@ -603,7 +628,7 @@ const VendorCard = ({ vendor, onApprove, onDeny, isPending, onToggleStatus, onDe
 );
 
 // Users Tab Component
-const UsersTab = ({ users, onToggleStatus, searchTerm, onSearchChange }) => {
+const UsersTab = ({ users, onToggleStatus, onDelete, searchTerm, onSearchChange }) => {
   const filteredUsers = users.filter(u =>
     u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     u.email?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -638,8 +663,21 @@ const UsersTab = ({ users, onToggleStatus, searchTerm, onSearchChange }) => {
               <tr key={user._id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold mr-3">
-                      {user.name?.charAt(0).toUpperCase()}
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold mr-3 overflow-hidden">
+                      {user.avatar ? (
+                        <img 
+                          src={user.avatar} 
+                          alt={user.name} 
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = '';
+                            e.target.parentNode.textContent = user.name?.charAt(0).toUpperCase() || 'U';
+                          }}
+                        />
+                      ) : (
+                        user.name?.charAt(0).toUpperCase() || 'U'
+                      )}
                     </div>
                     <span className="font-medium">{user.name}</span>
                   </div>
@@ -658,16 +696,26 @@ const UsersTab = ({ users, onToggleStatus, searchTerm, onSearchChange }) => {
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <button
-                    onClick={() => onToggleStatus(user._id, user.isActive)}
-                    className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                      user.isActive
-                        ? 'bg-red-100 text-red-800 hover:bg-red-200'
-                        : 'bg-green-100 text-green-800 hover:bg-green-200'
-                    }`}
-                  >
-                    {user.isActive ? 'Deactivate' : 'Activate'}
-                  </button>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => onToggleStatus(user._id, user.isActive)}
+                      className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                        user.isActive
+                          ? 'bg-red-100 text-red-800 hover:bg-red-200'
+                          : 'bg-green-100 text-green-800 hover:bg-green-200'
+                      }`}
+                    >
+                      {user.isActive ? 'Deactivate' : 'Activate'}
+                    </button>
+                    {user.role !== 'admin' && (
+                      <button
+                        onClick={() => onDelete(user._id)}
+                        className="px-3 py-1 bg-red-100 text-red-800 rounded text-sm font-medium hover:bg-red-200 transition-colors"
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}

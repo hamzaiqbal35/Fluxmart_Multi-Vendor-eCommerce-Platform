@@ -15,9 +15,14 @@ const { uploadProductImages } = require('../middleware/upload');
 
 router.get('/', getProducts);
 router.get('/:id', getProduct);
+// Only vendors can create products
 router.post('/', protect, authorize('vendor'), isVerifiedVendor, createProduct);
-router.put('/:id', protect, authorize('vendor'), isVerifiedVendor, updateProduct);
-router.delete('/:id', protect, authorize('vendor'), isVerifiedVendor, deleteProduct);
+
+// Both admins and vendors can update products (with different permissions in controller)
+router.put('/:id', protect, authorize(['admin', 'vendor']), updateProduct);
+
+// Both admins and vendors can delete products (with different permissions in controller)
+router.delete('/:id', protect, authorize(['admin', 'vendor']), deleteProduct);
 router.post('/:id/reviews', protect, addReview);
 
 // New route for uploading product images

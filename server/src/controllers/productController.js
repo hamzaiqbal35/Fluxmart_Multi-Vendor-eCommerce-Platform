@@ -92,9 +92,34 @@ const updateProduct = async (req, res) => {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    // Check if user is the vendor or admin
-    if (product.vendor.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Not authorized to update this product' });
+    // If user is admin, only allow updating isActive status
+    if (req.user.role === 'admin') {
+      if (Object.keys(req.body).length > 1 || req.body.isActive === undefined) {
+        return res.status(403).json({ 
+          success: false,
+          message: 'Admins can only update the isActive status of products' 
+        });
+      }
+      
+      // Update only the isActive status
+      const updatedProduct = await Product.findByIdAndUpdate(
+        req.params.id,
+        { isActive: req.body.isActive },
+        { new: true, runValidators: true }
+      ).populate('vendor', 'name email vendorInfo.businessName');
+      
+      return res.json({
+        success: true,
+        product: updatedProduct
+      });
+    }
+    
+    // For vendors, check ownership and allow full update
+    if (product.vendor.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ 
+        success: false,
+        message: 'Not authorized to update this product' 
+      });
     }
 
     product = await Product.findByIdAndUpdate(req.params.id, req.body, {
@@ -122,8 +147,12 @@ const deleteProduct = async (req, res) => {
       return res.status(404).json({ message: 'Product not found' });
     }
 
+    // Check if user is either the product owner or an admin
     if (product.vendor.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Not authorized to delete this product' });
+      return res.status(403).json({ 
+        success: false,
+        message: 'Not authorized to delete this product' 
+      });
     }
 
     await product.deleteOne();
