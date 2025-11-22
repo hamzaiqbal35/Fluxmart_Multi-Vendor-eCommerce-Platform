@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import api from '../utils/api';
 import { formatPricePKR } from '../utils/currency';
@@ -7,6 +8,7 @@ const OrderDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -60,6 +62,9 @@ const OrderDetails = () => {
   };
 
   const handleUpdateOrder = async () => {
+    if (!window.confirm('Are you sure you want to save these changes?')) {
+      return;
+    }
     try {
       await api.put(`/orders/${id}`, { orderItems: updatedItems });
       await fetchOrder();
@@ -73,8 +78,8 @@ const OrderDetails = () => {
   const handleQuantityChange = (index, newQuantity) => {
     if (newQuantity < 1) return;
     const item = updatedItems[index];
-    if (newQuantity > (item.product?.stock || 100)) {
-      alert(`Limited stock available`);
+    if (newQuantity > (item.product?.stock || 0)) {
+      alert(`Only ${item.product.stock} items available in stock.`);
       return;
     }
     const updated = [...updatedItems];
@@ -83,6 +88,9 @@ const OrderDetails = () => {
   };
 
   const handleRemoveItem = (index) => {
+    if (!window.confirm('Are you sure you want to remove this item?')) {
+      return;
+    }
     if (updatedItems.length === 1) {
       alert('Cannot remove all items from order. Cancel the order instead.');
       return;
@@ -115,12 +123,14 @@ const OrderDetails = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <button
-        onClick={() => navigate('/orders')}
-        className="mb-4 text-blue-600 hover:text-blue-800 font-semibold"
-      >
-        ← Back to Orders
-      </button>
+      {user && user.role !== 'vendor' && user.role !== 'admin' && (
+        <button
+          onClick={() => navigate('/orders')}
+          className="mb-4 text-blue-600 hover:text-blue-800 font-semibold"
+        >
+          ← Back to Orders
+        </button>
+      )}
 
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
@@ -130,25 +140,30 @@ const OrderDetails = () => {
               Placed on {order.createdAt ? new Date(order.createdAt).toLocaleString() : 'N/A'}
             </p>
           </div>
-          <span className={`mt-2 md:mt-0 px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(order.status)}`}>
+          <span 
+            className={`mt-2 md:mt-0 px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(order.status)}`}
+            aria-label={`Order status: ${order.status || 'unknown'}`}
+          >
             {order.status?.charAt(0).toUpperCase() + order.status?.slice(1) || 'Unknown'}
           </span>
         </div>
 
         {/* Action Buttons - VISIBLE HERE */}
         <div className="flex flex-wrap gap-3 pt-4 border-t">
-          {canEditOrder(order.status) && !editingItems && (
+          {user && user.role !== 'vendor' && user.role !== 'admin' && canEditOrder(order.status) && !editingItems && (
             <button
               onClick={() => setEditingItems(true)}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center gap-2"
+              aria-label="Edit Order"
             >
               ✏️ Edit Order
             </button>
           )}
-          {canCancelOrder(order.status) && !editingItems && (
+          {user && user.role !== 'vendor' && canCancelOrder(order.status) && !editingItems && (
             <button
               onClick={() => setShowCancelModal(true)}
               className="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors flex items-center gap-2"
+              aria-label="Cancel Order"
             >
               ❌ Cancel Order
             </button>
@@ -310,6 +325,14 @@ const OrderDetails = () => {
             )}
           </div>
         </div>
+
+        {(order.status === 'delivered' || order.isDelivered) && order.deliveredAt && (
+          <div className="border-t pt-4 mt-4">
+            <p className="text-green-600 text-sm">
+              ✓ Delivered on {new Date(order.deliveredAt).toLocaleString()}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Cancel Order Modal */}
