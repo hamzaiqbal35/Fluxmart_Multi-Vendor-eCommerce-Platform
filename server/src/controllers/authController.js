@@ -116,7 +116,7 @@ const forgotPassword = async (req, res) => {
       .digest('hex');
 
     user.resetPasswordToken = resetTokenHash;
-    user.resetPasswordExpires = Date.now() + 60 * 60 * 1000; // 1 hour
+    user.resetPasswordExpire = Date.now() + 60 * 60 * 1000; // 1 hour
     await user.save({ validateBeforeSave: false });
 
     const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
@@ -142,31 +142,92 @@ const resetPassword = async (req, res) => {
     const { token } = req.params;
     const { password } = req.body;
 
-    const resetTokenHash = crypto
+    // Hash the token
+    const resetPasswordToken = crypto
       .createHash('sha256')
       .update(token)
       .digest('hex');
 
+    // Find user by reset token and check expiration
     const user = await User.findOne({
-      resetPasswordToken: resetTokenHash,
-      resetPasswordExpires: { $gt: Date.now() }
+      resetPasswordToken,
+      resetPasswordExpire: { $gt: Date.now() }
     });
 
     if (!user) {
-      return res.status(400).json({ message: 'Invalid or expired reset token' });
+      return res.status(400).json({ message: 'Invalid or expired token' });
     }
 
+    // Set new password and clear reset token
     user.password = password;
     user.resetPasswordToken = undefined;
-    user.resetPasswordExpires = undefined;
+    user.resetPasswordExpire = undefined;
+
     await user.save();
 
     res.json({ success: true, message: 'Password reset successful' });
   } catch (error) {
-    console.error('Reset password error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: error.message });
   }
 };
 
-module.exports = { register, login, getMe, forgotPassword, resetPassword };
+// In authController.js
+const updatePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Please provide both current and new password'
+      });
+    }
 
+    const user = await User.findById(req.user._id).select('+password');
+    
+    if (!user) {
+      return res.status(404).json({ 
+        success: false,
+        message: 'User not found' 
+      });
+    }
+
+    // Check current password
+    const isMatch = await user.matchPassword(currentPassword);
+    if (!isMatch) {
+      return res.status(401).json({ 
+        success: false,
+        message: 'Current password is incorrect' 
+      });
+    }
+
+    // Update password
+    user.password = newPassword;
+    await user.save();
+
+    // Generate new token
+    const token = generateToken(user._id);
+
+    res.json({
+      success: true,
+      token,
+      message: 'Password updated successfully'
+    });
+  } catch (error) {
+    console.error('Update password error:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Error updating password',
+      error: error.message 
+    });
+  }
+};
+
+module.exports = { 
+  register, 
+  login, 
+  getMe, 
+  forgotPassword, 
+  resetPassword,
+  updatePassword 
+};

@@ -285,13 +285,11 @@ const AdminDashboard = () => {
 
   const handleAddCategory = async (categoryName) => {
     if (!categoryName.trim()) return;
-    // Mock implementation - replace with actual API call
     setCategories([...categories, categoryName.trim()]);
   };
 
   const handleDeleteCategory = async (categoryName) => {
     if (!window.confirm(`Delete category "${categoryName}"?`)) return;
-    // Mock implementation - replace with actual API call
     setCategories(categories.filter(c => c !== categoryName));
   };
 

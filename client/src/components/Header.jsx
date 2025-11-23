@@ -72,6 +72,11 @@ const Header = () => {
               className="h-10 w-auto object-contain transition-transform duration-200 group-hover:rotate-3"
               onError={(e) => {
                 e.target.style.display = 'none';
+                const textLogo = e.target.nextElementSibling;
+                if (textLogo) {
+                  textLogo.classList.remove('text-transparent');
+                  textLogo.classList.add('text-blue-600');
+                }
               }}
             />
             <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">

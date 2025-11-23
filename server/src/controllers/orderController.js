@@ -320,8 +320,11 @@ const cancelOrder = async (req, res) => {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    // Check ownership
-    if (order.user.toString() !== userId.toString()) {
+    // Check ownership or admin status
+    const isAdmin = req.user.role === 'admin';
+    const isOrderOwner = order.user.toString() === userId.toString();
+    
+    if (!isOrderOwner && !isAdmin) {
       return res.status(403).json({ message: 'Not authorized to cancel this order' });
     }
 
@@ -472,7 +475,15 @@ const updateOrderStatus = async (req, res) => {
         break;
         
       case 'cancelled':
-        // This should typically use the cancelOrder function instead
+        // Restore product stock when order is cancelled
+        for (const item of order.orderItems) {
+          if (item.product) {
+            await Product.findByIdAndUpdate(
+              item.product._id,
+              { $inc: { stock: item.quantity } }
+            );
+          }
+        }
         order.isShipped = false;
         order.shippedAt = null;
         order.isDelivered = false;

@@ -43,7 +43,7 @@ const sendOrderConfirmationEmail = async (userEmail, orders) => {
   try {
     const orderDetails = orders.map(order => {
       const items = order.orderItems.map(item => 
-        `- ${item.name} x${item.quantity} - $${item.price * item.quantity}`
+        `- ${item.name} x${item.quantity} - ${item.price * item.quantity}`
       ).join('\n');
       
       return `
