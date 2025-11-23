@@ -132,23 +132,23 @@ const deleteCategory = async (req, res) => {
       });
     }
 
-    // 2. Check for active products in this category by name (since category is stored as string in Product)
+    // 2. Check for any products (active or inactive) in this category
     const productCount = await mongoose.model('Product').countDocuments({
-      category: category.name,  // Changed from category._id to category.name
-      isActive: true
+      category: category.name
     });
 
-    console.log(`Found ${productCount} active products in category "${category.name}"`);
+    console.log(`Found ${productCount} products (active and inactive) in category "${category.name}"`);
 
     if (productCount > 0) {
+      // 3. If there are any products (active or inactive), prevent deletion
       return res.status(400).json({
         success: false,
-        message: 'Cannot delete category with active products. Please deactivate or move the products first.',
+        message: 'Cannot delete category with existing products. Please delete or reassign the products first.',
       });
     }
 
-    // 3. If no products, perform hard delete
-    console.log('No active products found, proceeding with category deletion');
+    // 4. If no products, perform hard delete
+    console.log('No products found, proceeding with category deletion');
     await Category.findByIdAndDelete(req.params.id);
     
     console.log('Category deleted successfully:', category.name);
