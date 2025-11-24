@@ -72,33 +72,48 @@ const Products = () => {
             <h2 className="font-semibold mb-4">Filters</h2>
             
             <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">Search</label>
+              <label htmlFor="search-products" className="block text-sm font-medium mb-2">Search</label>
               <input
+                id="search-products"
+                name="search"
                 type="text"
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
                 placeholder="Search products..."
                 className="w-full px-3 py-2 border rounded-md"
+                aria-label="Search products"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Category</label>
               {loadingCategories ? (
-                <div className="w-full px-3 py-2 border rounded bg-gray-100 animate-pulse">
-                  Loading categories...
+                <div>
+                  <div className="block text-sm font-medium mb-2">Category</div>
+                  <div className="w-full px-3 py-2 border rounded bg-gray-100 animate-pulse">
+                    Loading categories...
+                  </div>
                 </div>
               ) : (
-                <select
-                  value={filters.category}
-                  onChange={(e) => handleFilterChange('category', e.target.value)}
-                  className="w-full px-3 py-2 border rounded-md"
-                >
-                  <option value="">All Categories</option>
-                  {categories.map((cat) => (
-                    <option key={cat._id} value={cat.name}>{cat.name}</option>
-                  ))}
-                </select>
+                <>
+                  <label htmlFor="category-filter" className="block text-sm font-medium mb-2">
+                    Category
+                  </label>
+                  <select
+                    id="category-filter"
+                    name="category"
+                    value={filters.category}
+                    onChange={(e) => handleFilterChange('category', e.target.value)}
+                    className="w-full px-3 py-2 border rounded-md"
+                    aria-label="Filter by category"
+                  >
+                    <option value="">All Categories</option>
+                    {categories.map((cat) => (
+                      <option key={cat._id} value={cat.name}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                </>
               )}
             </div>
           </div>

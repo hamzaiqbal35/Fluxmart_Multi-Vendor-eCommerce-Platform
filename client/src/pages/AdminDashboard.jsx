@@ -501,13 +501,19 @@ const VendorsTab = ({ vendors, onApprove, onDeny, onToggleStatus, onDelete, sear
       {/* Search bar remains the same */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Vendor Management</h2>
-        <input
-          type="text"
-          placeholder="Search vendors..."
-          value={searchTerm}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        />
+        <div className="relative">
+          <label htmlFor="vendor-search" className="sr-only">Search vendors</label>
+          <input
+            id="vendor-search"
+            name="vendorSearch"
+            type="search"
+            placeholder="Search vendors..."
+            value={searchTerm}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            aria-label="Search vendors"
+          />
+        </div>
       </div>
 
       {/* Pending Vendors Section */}
@@ -650,13 +656,19 @@ const UsersTab = ({ users, onToggleStatus, onDelete, searchTerm, onSearchChange 
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">User Management</h2>
-        <input
-          type="text"
-          placeholder="Search users..."
-          value={searchTerm}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        />
+        <div className="relative">
+          <label htmlFor="user-search" className="sr-only">Search users</label>
+          <input
+            id="user-search"
+            name="userSearch"
+            type="search"
+            placeholder="Search users..."
+            value={searchTerm}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            aria-label="Search users"
+          />
+        </div>
       </div>
 
       <div className="overflow-x-auto">
@@ -751,13 +763,19 @@ const ProductsTab = ({ products, onToggleStatus, onDelete, searchTerm, onSearchC
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Product Management</h2>
-        <input
-          type="text"
-          placeholder="Search products..."
-          value={searchTerm}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        />
+        <div className="relative">
+          <label htmlFor="product-search" className="sr-only">Search products</label>
+          <input
+            id="product-search"
+            name="productSearch"
+            type="search"
+            placeholder="Search products..."
+            value={searchTerm}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            aria-label="Search products"
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4">
@@ -822,13 +840,19 @@ const OrdersTab = ({ orders, onUpdateStatus, searchTerm, onSearchChange }) => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Order Management</h2>
-        <input
-          type="text"
-          placeholder="Search orders..."
-          value={searchTerm}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        />
+        <div className="relative">
+          <label htmlFor="order-search" className="sr-only">Search orders</label>
+          <input
+            id="order-search"
+            name="orderSearch"
+            type="search"
+            placeholder="Search orders..."
+            value={searchTerm}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            aria-label="Search orders"
+          />
+        </div>
       </div>
 
       <div className="space-y-4">
@@ -1007,12 +1031,16 @@ const CategoriesTab = () => {
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Category Management</h2>
         <div className="w-64">
+          <label htmlFor="category-search" className="sr-only">Search categories</label>
           <input
-            type="text"
+            id="category-search"
+            name="categorySearch"
+            type="search"
             placeholder="Search categories..."
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            aria-label="Search categories"
           />
         </div>
       </div>
@@ -1025,27 +1053,38 @@ const CategoriesTab = () => {
         <form onSubmit={editingCategory ? handleUpdateCategory : handleCreateCategory} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label 
+                htmlFor="category-name" 
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Category Name *
               </label>
               <input
+                id="category-name"
+                name="categoryName"
                 type="text"
                 className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={editingCategory ? editingCategory.name : newCategory.name}
-                onChange={(e) => 
+                onChange={(e) =>
                   editingCategory
                     ? setEditingCategory({ ...editingCategory, name: e.target.value })
                     : setNewCategory({ ...newCategory, name: e.target.value })
                 }
                 required
+                aria-label="Category name"
                 placeholder="Enter category name"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label 
+                htmlFor="category-description" 
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Description
               </label>
               <input
+                id="category-description"
+                name="categoryDescription"
                 type="text"
                 className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={editingCategory ? editingCategory.description : newCategory.description}
@@ -1054,6 +1093,7 @@ const CategoriesTab = () => {
                     ? setEditingCategory({ ...editingCategory, description: e.target.value })
                     : setNewCategory({ ...newCategory, description: e.target.value })
                 }
+                aria-label="Category description"
                 placeholder="Enter description (optional)"
               />
             </div>
@@ -1061,9 +1101,10 @@ const CategoriesTab = () => {
           
           {editingCategory && (
             <div className="flex items-center">
-              <input
+<input
                 type="checkbox"
                 id="isActive"
+                name="isActive"
                 checked={editingCategory.isActive}
                 onChange={(e) =>
                   setEditingCategory({
@@ -1072,6 +1113,7 @@ const CategoriesTab = () => {
                   })
                 }
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                aria-label="Category active status"
               />
               <label htmlFor="isActive" className="ml-2 block text-sm text-gray-700">
                 Active

@@ -82,19 +82,24 @@ const Help = () => {
           
           {/* Search Box */}
           <div className="max-w-2xl mx-auto">
+            <label htmlFor="help-search" className="sr-only">Search help articles</label>
             <div className="relative">
               <input
-                type="text"
+                id="help-search"
+                name="helpSearch"
+                type="search"
                 placeholder="Search help articles..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full px-6 py-3 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                aria-label="Search help articles"
               />
               <svg
-                className="absolute right-4 top-3.5 w-5 h-5 text-gray-400"
+                className="absolute right-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
+                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"

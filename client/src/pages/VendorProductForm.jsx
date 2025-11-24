@@ -166,33 +166,39 @@ const VendorProductForm = () => {
 
         <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 space-y-6">
           <div>
-            <label className="block font-semibold mb-2">Product Name *</label>
+            <label htmlFor="product-name" className="block font-semibold mb-2">Product Name *</label>
             <input
+              id="product-name"
               type="text"
               name="name"
               value={formData.name}
               onChange={handleChange}
               required
+              autoComplete="off"
               className="w-full px-3 py-2 border rounded"
+              aria-required="true"
             />
           </div>
 
           <div>
-            <label className="block font-semibold mb-2">Description *</label>
+            <label htmlFor="product-description" className="block font-semibold mb-2">Description *</label>
             <textarea
+              id="product-description"
               name="description"
               value={formData.description}
               onChange={handleChange}
               required
               rows="4"
               className="w-full px-3 py-2 border rounded"
+              aria-required="true"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block font-semibold mb-2">Price *</label>
+              <label htmlFor="product-price" className="block font-semibold mb-2">Price *</label>
               <input
+                id="product-price"
                 type="number"
                 name="price"
                 value={formData.price}
@@ -201,11 +207,13 @@ const VendorProductForm = () => {
                 min="0"
                 step="0.01"
                 className="w-full px-3 py-2 border rounded"
+                aria-required="true"
               />
             </div>
             <div>
-              <label className="block font-semibold mb-2">Stock *</label>
+              <label htmlFor="product-stock" className="block font-semibold mb-2">Stock *</label>
               <input
+                id="product-stock"
                 type="number"
                 name="stock"
                 value={formData.stock}
@@ -213,23 +221,26 @@ const VendorProductForm = () => {
                 required
                 min="0"
                 className="w-full px-3 py-2 border rounded"
+                aria-required="true"
               />
             </div>
           </div>
 
           <div>
-            <label className="block font-semibold mb-2">Category *</label>
+            <label htmlFor="product-category" className="block font-semibold mb-2">Category *</label>
             {loadingCategories ? (
               <div className="w-full px-3 py-2 border rounded bg-gray-100 animate-pulse">
                 Loading categories...
               </div>
             ) : (
               <select
+                id="product-category"
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
                 required
                 className="w-full px-3 py-2 border rounded"
+                aria-required="true"
               >
                 <option value="">Select a category</option>
                 {categories
@@ -245,14 +256,16 @@ const VendorProductForm = () => {
 
           {/* Image Upload Section */}
           <div className="border-t pt-6">
-            <label className="block font-semibold mb-4">Product Images (Max 5)</label>
+            <h2 className="text-lg font-semibold mb-4">Product Images (Max 5)</h2>
 
             {/* Add Image URL */}
             <div className="mb-4 p-4 bg-gray-50 rounded">
-              <h3 className="font-medium mb-2">Add Image URL</h3>
+              <label htmlFor="image-url" className="block font-medium mb-2">Add Image URL</label>
               <div className="flex gap-2">
                 <input
+                  id="image-url"
                   type="url"
+                  name="imageUrl"
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
                   placeholder="https://example.com/image.jpg"
@@ -302,28 +315,35 @@ const VendorProductForm = () => {
           </div>
 
           <div>
-            <label className="block font-semibold mb-2">Tags (comma-separated)</label>
+            <label htmlFor="product-tags" className="block font-semibold mb-2">Tags (comma-separated)</label>
             <input
+              id="product-tags"
               type="text"
               name="tags"
               value={formData.tags}
               onChange={handleChange}
               placeholder="tag1, tag2, tag3"
               className="w-full px-3 py-2 border rounded"
+              autoComplete="off"
+              aria-describedby="tags-help"
             />
+            <p id="tags-help" className="text-sm text-gray-500 mt-1">Separate tags with commas</p>
           </div>
 
           <div>
-            <label className="flex items-center">
+            <div className="flex items-center">
               <input
+                id="product-active"
                 type="checkbox"
                 name="isActive"
                 checked={formData.isActive}
                 onChange={handleChange}
-                className="mr-2"
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
-              <span>Product is active</span>
-            </label>
+              <label htmlFor="product-active" className="ml-2 block text-sm text-gray-900">
+                Product is active
+              </label>
+            </div>
           </div>
 
           <div className="flex space-x-4">

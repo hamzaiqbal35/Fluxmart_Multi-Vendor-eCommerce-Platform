@@ -129,9 +129,11 @@ const ProductDetails = () => {
             )}
           </div>
 
-          <div className="flex items-center space-x-4 mb-6">
-            <label className="font-semibold">Quantity:</label>
+          <div className="mb-6">
+            <label htmlFor="product-quantity" className="font-semibold block mb-2">Quantity:</label>
             <input
+              id="product-quantity"
+              name="quantity"
               type="number"
               min={isVendor ? VENDOR_BULK_MIN : 1}
               max={product.stock}
@@ -142,6 +144,7 @@ const ProductDetails = () => {
                 setQuantity(value < min ? min : value);
               }}
               className="w-20 px-3 py-2 border rounded"
+              aria-label="Product quantity"
             />
           </div>
 
@@ -166,11 +169,14 @@ const ProductDetails = () => {
           <form onSubmit={handleSubmitReview} className="bg-gray-50 p-6 rounded-lg mb-8">
             <h3 className="text-xl font-semibold mb-4">Write a Review</h3>
             <div className="mb-4">
-              <label className="block font-semibold mb-2">Rating</label>
+              <label htmlFor="review-rating" className="block font-semibold mb-2">Rating</label>
               <select
+                id="review-rating"
+                name="rating"
                 value={review.rating}
                 onChange={(e) => setReview({ ...review, rating: parseInt(e.target.value) })}
                 className="px-3 py-2 border rounded"
+                aria-label="Select rating"
               >
                 <option value={5}>5 Stars</option>
                 <option value={4}>4 Stars</option>
@@ -180,13 +186,16 @@ const ProductDetails = () => {
               </select>
             </div>
             <div className="mb-4">
-              <label className="block font-semibold mb-2">Comment</label>
+              <label htmlFor="review-comment" className="block font-semibold mb-2">Comment</label>
               <textarea
+                id="review-comment"
+                name="comment"
                 value={review.comment}
                 onChange={(e) => setReview({ ...review, comment: e.target.value })}
                 rows="4"
                 className="w-full px-3 py-2 border rounded"
                 placeholder="Share your thoughts about this product..."
+                aria-label="Write your review"
               />
             </div>
             <button
