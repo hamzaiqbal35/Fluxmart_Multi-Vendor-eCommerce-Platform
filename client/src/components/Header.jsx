@@ -67,7 +67,7 @@ const Header = () => {
             className="flex items-center space-x-2 group transition-transform duration-200 hover:scale-105"
           >
             <img 
-              src="src/assets/logo.png" 
+              src="/images/logo.png" 
               alt="Fluxmart Logo" 
               className="h-10 w-auto object-contain transition-transform duration-200 group-hover:rotate-3"
               onError={(e) => {

@@ -12,6 +12,7 @@ const orderRoutes = require('./routes/orderRoutes');
 const userRoutes = require('./routes/userRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
+const reportRoutes = require('./routes/reportRoutes');
 
 const app = express();
 
@@ -34,6 +35,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api', contactRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/reports', reportRoutes);
 
 // Root route - API information
 app.get('/', (req, res) => {
@@ -46,7 +48,8 @@ app.get('/', (req, res) => {
       products: '/api/products',
       cart: '/api/cart',
       orders: '/api/orders',
-      users: '/api/users',
+      categories: '/api/categories',
+      reports: '/api/reports',
       health: '/api/health'
     },
     documentation: 'This is the backend API server. The frontend runs on http://localhost:5173'
