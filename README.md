@@ -40,7 +40,6 @@ A full-featured multi-vendor eCommerce platform that enables vendors to sell the
 - **State Management**: React Context API
 - **Styling**: Tailwind CSS
 - **Routing**: React Router
-- **HTTP Client**: Axios
 - **Build Tool**: Vite
 
 ### Backend
@@ -138,7 +137,7 @@ For any questions or feedback, please reach out to our team at [contact@apexcify
 ---
 
 <div align="center">
-  Made with ❤️ by Apexcify Technologies
+  Made with ❤️ by Hamza Iqbal
 </div>
 
    Start the client (from `client` directory in a new terminal):
@@ -266,7 +265,6 @@ Email notifications are optional. To enable:
 ## Future Enhancements
 
 - Payment gateway integration
-- Image upload functionality
 - Advanced search and filters
 - Wishlist feature
 - Product recommendations
