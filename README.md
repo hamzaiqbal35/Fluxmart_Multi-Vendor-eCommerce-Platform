@@ -1,103 +1,145 @@
-# Multi-Vendor eCommerce Platform
+# 🛍️ Multi-Vendor eCommerce Platform
 
-A full-stack e-commerce platform with support for multiple vendors, customers, and administrators. Built with React, Node.js, Express, and MongoDB.
+<div align="center">
+  <p>
+    <a href="#">
+      <img src="https://img.shields.io/badge/version-1.0.0-blue" alt="Version">
+    </a>
+    <a href="#">
+      <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
+    </a>
+    <a href="#">
+      <img src="https://img.shields.io/badge/PRs-welcome-brightgreen" alt="PRs Welcome">
+    </a>
+  </p>
+</div>
 
-## Features
+A full-featured multi-vendor eCommerce platform that enables vendors to sell their products and customers to browse and purchase items in a seamless shopping experience. Built with modern web technologies for optimal performance and scalability.
 
-### Core Features
-- ✅ Shopping cart functionality
-- ✅ Product details page with reviews and ratings
-- ✅ Order processing and tracking
-- ✅ Vendor & Customer roles
-- ✅ Product listing by vendors
-- ✅ Cart, checkout, and order tracking
-- ✅ Admin dashboard to manage products, users, and orders
-- ✅ Customer reviews & ratings
-- ✅ Email notifications (configurable)
-- ✅ Responsive mobile-first design
-- ✅ MongoDB database for storing products, users, and orders
+## ✨ Features
 
-### User Roles
-- **Customer**: Browse products, add to cart, place orders, leave reviews
-- **Vendor**: Create and manage products, view orders
-- **Admin**: Manage all users, products, and orders
+### 🛒 Core Features
+- **Multi-Vendor Marketplace**: Multiple vendors can sign up and manage their products
+- **User Authentication**: Secure JWT-based authentication for customers, vendors, and admins
+- **Product Management**: Vendors can add, edit, and manage their product listings
+- **Shopping Cart**: Persistent shopping cart with guest checkout support
+- **Order Processing**: Complete order lifecycle management
+- **Reviews & Ratings**: Customers can leave reviews and ratings for products
+- **Admin Dashboard**: Comprehensive admin panel for platform management
+- **Responsive Design**: Fully responsive UI that works on all devices
 
-## Tech Stack
+### 👥 User Roles
+- **Customers**: Browse products, add to cart, place orders, leave reviews
+- **Vendors**: Manage products, view orders, update order status
+- **Administrators**: Manage users, products, orders, and platform settings
 
-### Backend
-- Node.js
-- Express.js
-- MongoDB (Mongoose)
-- JWT Authentication
-- Nodemailer (for email notifications)
+## 🚀 Tech Stack
 
 ### Frontend
-- React 19
-- React Router
-- Axios
-- Tailwind CSS
-- Context API (for state management)
+- **Framework**: React 19
+- **State Management**: React Context API
+- **Styling**: Tailwind CSS
+- **Routing**: React Router
+- **HTTP Client**: Axios
+- **Build Tool**: Vite
 
-## Getting Started
+### Backend
+- **Runtime**: Node.js
+- **Framework**: Express.js
+- **Database**: MongoDB with Mongoose
+- **Authentication**: JWT
+- **File Upload**: Multer
+- **Email**: Nodemailer
+
+## 🛠️ Project Structure
+
+```
+.
+├── client/                 # Frontend React application
+│   ├── public/             # Static files
+│   └── src/                # Source code
+│       ├── components/     # Reusable UI components
+│       ├── context/        # React context providers
+│       ├── pages/          # Page components
+│       └── utils/          # Utility functions
+│
+└── server/                 # Backend Node.js/Express application
+    ├── config/            # Configuration files
+    ├── controllers/       # Route controllers
+    ├── middleware/        # Custom middleware
+    ├── models/            # Database models
+    ├── routes/            # API routes
+    └── uploads/           # File uploads directory
+```
+
+## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js (v14 or higher)
-- MongoDB (local or MongoDB Atlas)
-- npm or yarn
+- Node.js (v18 or higher)
+- MongoDB (v6.0 or higher)
+- npm (v9.0 or higher) or yarn
 
 ### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/hamzaiqbal35/ApexcifyTechnologys_Multi-Vendor-eCommerce-Platform.git
+   git
    cd "ApexcifyTechnologys_Multi-Vendor eCommerce Platform"
    ```
 
-2. **Install server dependencies**
+2. **Install dependencies**
    ```bash
+   # Install server dependencies
    cd server
    npm install
-   ```
-
-3. **Install client dependencies**
-   ```bash
+   
+   # Install client dependencies
    cd ../client
    npm install
    ```
 
-4. **Set up environment variables**
+3. **Environment Setup**
+   - Create `.env` files in both `client` and `server` directories
+   - Use the examples provided in `.env.example` files
 
-   Create a `.env` file in the `server` directory:
-   ```env
-   PORT=5000
-   NODE_ENV=development
-   MONGODB_URI=mongodb://localhost:27017/ecommerce
-   JWT_SECRET=your-super-secret-jwt-key-change-in-production
-   JWT_EXPIRE=30d
-   CLIENT_URL=http://localhost:5173
-   
-   # Optional: Email configuration
-   SMTP_HOST=smtp.gmail.com
-   SMTP_PORT=587
-   SMTP_USER=your-email@gmail.com
-   SMTP_PASS=your-app-password
-   SMTP_FROM=noreply@ecommerce.com
-   ```
-
-   Create a `.env` file in the `client` directory:
-   ```env
-   VITE_API_URL=http://localhost:5000/api
-   ```
-
-5. **Start MongoDB**
-   Make sure MongoDB is running on your system or update `MONGODB_URI` in the `.env` file to point to your MongoDB instance.
-
-6. **Run the application**
-
-   Start the server (from `server` directory):
+4. **Start the development servers**
    ```bash
+   # In the server directory
+   npm run dev
+   
+   # In a new terminal, from the client directory
    npm run dev
    ```
+
+5. **Access the application**
+   - Frontend: http://localhost:5173
+   - Backend API: http://localhost:5000
+   - API Documentation: http://localhost:5000/api-docs (if Swagger is configured)
+
+## 📚 Documentation
+
+- [API Documentation](server/README.md) - Detailed API endpoints and usage
+- [Frontend Documentation](client/README.md) - Frontend architecture and components
+- [Deployment Guide](DEPLOYMENT.md) - Instructions for deploying to production
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 📬 Contact
+
+For any questions or feedback, please reach out to our team at [contact@apexcify.com](mailto:contact@apexcify.com).
+
+---
+
+<div align="center">
+  Made with ❤️ by Apexcify Technologies
+</div>
 
    Start the client (from `client` directory in a new terminal):
    ```bash
