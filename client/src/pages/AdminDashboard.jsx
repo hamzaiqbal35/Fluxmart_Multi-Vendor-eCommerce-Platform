@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import api from '../utils/api';
 import ProtectedRoute from '../components/ProtectedRoute';
@@ -173,124 +173,140 @@ const AdminDashboard = () => {
       await api.put(`/users/${vendorId}`, { 
         'vendorInfo.isVerified': true 
       });
-      alert('Vendor approved successfully!');
+      toast.success('Vendor approved successfully!');
       fetchVendors();
       fetchStats();
     } catch (error) {
-      alert(error.response?.data?.message || 'Failed to approve vendor');
+      toast.error(error.response?.data?.message || 'Failed to approve vendor');
     }
   };
 
   const handleDenyVendor = async (vendorId) => {
-    if (!window.confirm('Are you sure you want to deny this vendor?')) return;
-    
-    try {
-      await api.put(`/users/${vendorId}`, { 
-        'vendorInfo.isVerified': false,
-        isActive: false
-      });
-      alert('Vendor denied');
-      fetchVendors();
-      fetchStats();
-    } catch (error) {
-      alert(error.response?.data?.message || 'Failed to deny vendor');
+    if (window.confirm('Are you sure you want to deny this vendor?')) {
+      const confirmResult = window.confirm('This will deactivate the vendor. Are you sure?');
+      if (!confirmResult) return;
+      
+      try {
+        await api.put(`/users/${vendorId}`, { 
+          'vendorInfo.isVerified': false,
+          isActive: false
+        });
+        toast.success('Vendor denied successfully');
+        fetchVendors();
+        fetchStats();
+      } catch (error) {
+        toast.error(error.response?.data?.message || 'Failed to deny vendor');
+      }
     }
   };
 
   const handleToggleVendorStatus = async (vendorId, isActive) => {
     const action = isActive ? 'Deactivate' : 'Activate';
-    if (!window.confirm(`Are you sure you want to ${action} this vendor?`)) return;
-
+    const confirmResult = window.confirm(`Are you sure you want to ${action.toLowerCase()} this vendor?`);
+    if (!confirmResult) return;
+    
     try {
       await api.put(`/users/${vendorId}`, { isActive: !isActive });
-      alert(`Vendor ${action}d successfully!`);
+      toast.success(`Vendor ${action.toLowerCase()}d successfully!`);
       fetchVendors();
     } catch (error) {
-      alert(error.response?.data?.message || 'Failed to update vendor status');
+      toast.error(error.response?.data?.message || 'Failed to update vendor status');
     }
   };
 
   const handleDeleteVendor = async (vendorId) => {
-    if (!window.confirm('Are you sure you want to DELETE this vendor? This action is irreversible.')) return;
-
+    const confirmResult = window.confirm('Are you sure you want to DELETE this vendor? This action is irreversible and cannot be undone.');
+    if (!confirmResult) return;
+    
     try {
       await api.delete(`/users/${vendorId}`);
-      alert('Vendor deleted successfully');
+      toast.success('Vendor deleted successfully');
       fetchVendors();
       fetchStats();
     } catch (error) {
-      alert(error.response?.data?.message || 'Failed to delete vendor');
+      toast.error(error.response?.data?.message || 'Failed to delete vendor');
     }
   };
 
   const handleToggleUserStatus = async (userId, isActive) => {
     const action = isActive ? 'deactivate' : 'activate';
-    if (!window.confirm(`Are you sure you want to ${action} this user?`)) return;
-
+    const confirmResult = window.confirm(`Are you sure you want to ${action} this user?`);
+    if (!confirmResult) return;
+    
     try {
       await api.put(`/users/${userId}`, { isActive: !isActive });
+      toast.success(`User ${action}d successfully`);
       fetchUsers();
     } catch (error) {
       console.error('Error toggling user status:', error);
-      alert(error.response?.data?.message || 'Failed to update user status');
+      toast.error(error.response?.data?.message || 'Failed to update user status');
     }
   };
 
   const handleDeleteUser = async (userId) => {
-    if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
-      try {
-        await api.delete(`/users/${userId}`);
-        fetchUsers();
-        alert('User deleted successfully');
-      } catch (error) {
-        console.error('Error deleting user:', error);
-        alert(error.response?.data?.message || 'Failed to delete user');
-      }
+    const confirmResult = window.confirm('Are you sure you want to delete this user? This action is permanent and cannot be undone.');
+    if (!confirmResult) return;
+    
+    try {
+      await api.delete(`/users/${userId}`);
+      toast.success('User deleted successfully');
+      fetchUsers();
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      toast.error(error.response?.data?.message || 'Failed to delete user');
     }
   };
 
   const handleToggleProductStatus = async (productId, currentStatus) => {
     try {
       await api.put(`/products/${productId}`, { isActive: !currentStatus });
+      toast.success(`Product has been ${currentStatus ? 'deactivated' : 'activated'} successfully`);
       fetchProducts();
-      alert(`Product has been ${currentStatus ? 'deactivated' : 'activated'} successfully`);
     } catch (error) {
       console.error('Error toggling product status:', error);
-      alert(error.response?.data?.message || 'Failed to update product status');
+      toast.error(error.response?.data?.message || 'Failed to update product status');
     }
   };
 
   const handleDeleteProduct = async (productId) => {
-    if (window.confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
-      try {
-        await api.delete(`/products/${productId}`);
-        fetchProducts();
-        alert('Product deleted successfully');
-      } catch (error) {
-        console.error('Error deleting product:', error);
-        alert(error.response?.data?.message || 'Failed to delete product');
-      }
+    const confirmResult = window.confirm('Are you sure you want to delete this product? This action is permanent and cannot be undone.');
+    if (!confirmResult) return;
+    
+    try {
+      await api.delete(`/products/${productId}`);
+      toast.success('Product deleted successfully');
+      fetchProducts();
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      toast.error(error.response?.data?.message || 'Failed to delete product');
     }
   };
 
   const handleUpdateOrderStatus = async (orderId, status) => {
     try {
       await api.put(`/orders/${orderId}/status`, { status });
-      alert('Order status updated');
+      toast.success('Order status updated successfully');
       fetchOrders();
     } catch (error) {
-      alert(error.response?.data?.message || 'Failed to update order status');
+      toast.error(error.response?.data?.message || 'Failed to update order status');
     }
   };
 
   const handleAddCategory = async (categoryName) => {
-    if (!categoryName.trim()) return;
+    if (!categoryName.trim()) {
+      toast.warning('Please enter a category name');
+      return;
+    }
     setCategories([...categories, categoryName.trim()]);
+    toast.success('Category added successfully');
   };
 
   const handleDeleteCategory = async (categoryName) => {
-    if (!window.confirm(`Delete category "${categoryName}"?`)) return;
+    const confirmResult = window.confirm(`Are you sure you want to delete the category "${categoryName}"? This action cannot be undone.`);
+    if (!confirmResult) return;
+    
     setCategories(categories.filter(c => c !== categoryName));
+    toast.success(`Category "${categoryName}" deleted`);
   };
 
   const tabs = [
