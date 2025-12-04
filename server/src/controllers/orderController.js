@@ -652,6 +652,53 @@ const fixOrderConsistency = async (req, res) => {
   }
 };
 
+// @desc    Request order cancellation (vendor)
+// @route   PUT /api/orders/:id/cancel-request
+// @access  Private (vendor)
+const requestOrderCancellation = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+
+    const order = await Order.findById(id);
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    // Verify vendor ownership
+    const isVendor = order.orderItems.some(
+      item => item.vendor.toString() === req.user._id.toString()
+    );
+
+    if (!isVendor) {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+
+    if (order.status === 'cancelled') {
+      return res.status(400).json({ message: 'Order is already cancelled' });
+    }
+
+    if (order.status === 'delivered') {
+      return res.status(400).json({ message: 'Cannot cancel delivered orders' });
+    }
+
+    order.vendorCancelRequested = true;
+    order.vendorCancelReason = reason;
+    order.vendorCancelRequestedAt = new Date();
+
+    await order.save();
+
+    res.json({
+      success: true,
+      message: 'Cancellation requested successfully',
+      order
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createOrder,
   getMyOrders,
@@ -661,5 +708,6 @@ module.exports = {
   updateOrderStatus,
   getAllOrders,
   updateOrderPaymentToggle,
-  fixOrderConsistency
+  fixOrderConsistency,
+  requestOrderCancellation
 };

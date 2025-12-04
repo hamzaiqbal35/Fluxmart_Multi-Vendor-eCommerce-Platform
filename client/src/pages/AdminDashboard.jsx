@@ -888,6 +888,29 @@ const OrdersTab = ({ orders, onUpdateStatus, searchTerm, onSearchChange, onToggl
                 </p>
                 <p className="text-sm text-gray-600">Total: {formatPricePKR(order.totalPrice)}</p>
 
+                {/* Vendor Cancellation Request Alert */}
+                {order.vendorCancelRequested && order.status !== 'cancelled' && (
+                  <div className="mt-3 bg-red-50 border border-red-200 rounded p-3">
+                    <div className="flex items-start">
+                      <span className="text-red-500 mr-2">⚠️</span>
+                      <div>
+                        <p className="text-sm font-bold text-red-800">Cancellation Requested by Vendor</p>
+                        <p className="text-sm text-red-700 mt-1">Reason: {order.vendorCancelReason}</p>
+                        <button
+                          onClick={() => {
+                            if (window.confirm('Approve cancellation for this order?')) {
+                              onUpdateStatus(order._id, 'cancelled');
+                            }
+                          }}
+                          className="mt-2 text-xs bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                        >
+                          Approve Cancellation
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Shipping Info Display */}
                 {order.status === 'shipped' && order.trackingNumber && (
                   <div className="mt-2 text-sm bg-gray-50 p-2 rounded">

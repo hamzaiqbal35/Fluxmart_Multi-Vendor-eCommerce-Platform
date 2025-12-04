@@ -19,6 +19,10 @@ const VendorDashboard = () => {
     estimatedDeliveryDate: ''
   });
 
+  // Cancellation Modal State
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelReason, setCancelReason] = useState('');
+
   useEffect(() => {
     fetchProducts();
     fetchOrders();
@@ -61,9 +65,30 @@ const VendorDashboard = () => {
     }
   };
 
+  const handleRequestCancel = async (e) => {
+    e.preventDefault();
+    if (!selectedOrder || !cancelReason.trim()) return;
+
+    try {
+      await api.put(`/orders/${selectedOrder._id}/cancel-request`, { reason: cancelReason });
+      alert('Cancellation requested successfully');
+      setShowCancelModal(false);
+      setCancelReason('');
+      fetchOrders();
+    } catch (error) {
+      console.error('Error requesting cancellation:', error);
+      alert(error.response?.data?.message || 'Failed to request cancellation');
+    }
+  };
+
   const openShippingModal = (order) => {
     setSelectedOrder(order);
     setShowShippingModal(true);
+  };
+
+  const openCancelModal = (order) => {
+    setSelectedOrder(order);
+    setShowCancelModal(true);
   };
 
   const handleShippingSubmit = (e) => {
@@ -179,11 +204,16 @@ const VendorDashboard = () => {
                         <p className="text-sm text-gray-600">
                           {new Date(order.createdAt).toLocaleDateString()}
                         </p>
+                        {order.vendorCancelRequested && (
+                          <span className="inline-block mt-1 px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded border border-red-200">
+                            Cancellation Requested
+                          </span>
+                        )}
                       </div>
                       <div className="flex flex-col items-end">
                         <span className={`px-3 py-1 rounded-full text-sm mb-2 ${order.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                            order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                              'bg-yellow-100 text-yellow-800'
+                          order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                            'bg-yellow-100 text-yellow-800'
                           }`}>
                           {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                         </span>
@@ -243,6 +273,16 @@ const VendorDashboard = () => {
                             className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm font-semibold"
                           >
                             Mark Delivered
+                          </button>
+                        )}
+
+                        {/* Request Cancel Button - Only if not cancelled/delivered and not already requested */}
+                        {!['cancelled', 'delivered'].includes(order.status) && !order.vendorCancelRequested && (
+                          <button
+                            onClick={() => openCancelModal(order)}
+                            className="px-3 py-2 bg-red-100 text-red-700 rounded hover:bg-red-200 text-sm font-semibold border border-red-200"
+                          >
+                            Request Cancel
                           </button>
                         )}
 
@@ -314,6 +354,49 @@ const VendorDashboard = () => {
                     className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                   >
                     Confirm Shipment
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Cancellation Request Modal */}
+        {showCancelModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg p-6 max-w-md w-full">
+              <h3 className="text-xl font-bold mb-4 text-red-600">Request Order Cancellation</h3>
+              <p className="text-gray-600 mb-4 text-sm">
+                Please provide a reason for cancellation. The admin will review your request.
+              </p>
+              <form onSubmit={handleRequestCancel}>
+                <div className="mb-4">
+                  <label className="block text-gray-700 mb-2 font-medium">Reason</label>
+                  <textarea
+                    required
+                    className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none"
+                    rows="4"
+                    value={cancelReason}
+                    onChange={(e) => setCancelReason(e.target.value)}
+                    placeholder="e.g. Out of stock, Customer request, etc."
+                  />
+                </div>
+                <div className="flex justify-end space-x-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowCancelModal(false);
+                      setCancelReason('');
+                    }}
+                    className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 font-medium"
+                  >
+                    Submit Request
                   </button>
                 </div>
               </form>
