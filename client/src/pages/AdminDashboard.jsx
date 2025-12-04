@@ -44,7 +44,7 @@ const AdminDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      
+
       if (activeTab === 'overview' || activeTab === 'analytics') {
         await Promise.all([
           fetchStats(),
@@ -170,8 +170,8 @@ const AdminDashboard = () => {
 
   const handleApproveVendor = async (vendorId) => {
     try {
-      await api.put(`/users/${vendorId}`, { 
-        'vendorInfo.isVerified': true 
+      await api.put(`/users/${vendorId}`, {
+        'vendorInfo.isVerified': true
       });
       toast.success('Vendor approved successfully!');
       fetchVendors();
@@ -185,9 +185,9 @@ const AdminDashboard = () => {
     if (window.confirm('Are you sure you want to deny this vendor?')) {
       const confirmResult = window.confirm('This will deactivate the vendor. Are you sure?');
       if (!confirmResult) return;
-      
+
       try {
-        await api.put(`/users/${vendorId}`, { 
+        await api.put(`/users/${vendorId}`, {
           'vendorInfo.isVerified': false,
           isActive: false
         });
@@ -204,7 +204,7 @@ const AdminDashboard = () => {
     const action = isActive ? 'Deactivate' : 'Activate';
     const confirmResult = window.confirm(`Are you sure you want to ${action.toLowerCase()} this vendor?`);
     if (!confirmResult) return;
-    
+
     try {
       await api.put(`/users/${vendorId}`, { isActive: !isActive });
       toast.success(`Vendor ${action.toLowerCase()}d successfully!`);
@@ -217,7 +217,7 @@ const AdminDashboard = () => {
   const handleDeleteVendor = async (vendorId) => {
     const confirmResult = window.confirm('Are you sure you want to DELETE this vendor? This action is irreversible and cannot be undone.');
     if (!confirmResult) return;
-    
+
     try {
       await api.delete(`/users/${vendorId}`);
       toast.success('Vendor deleted successfully');
@@ -232,7 +232,7 @@ const AdminDashboard = () => {
     const action = isActive ? 'deactivate' : 'activate';
     const confirmResult = window.confirm(`Are you sure you want to ${action} this user?`);
     if (!confirmResult) return;
-    
+
     try {
       await api.put(`/users/${userId}`, { isActive: !isActive });
       toast.success(`User ${action}d successfully`);
@@ -246,7 +246,7 @@ const AdminDashboard = () => {
   const handleDeleteUser = async (userId) => {
     const confirmResult = window.confirm('Are you sure you want to delete this user? This action is permanent and cannot be undone.');
     if (!confirmResult) return;
-    
+
     try {
       await api.delete(`/users/${userId}`);
       toast.success('User deleted successfully');
@@ -271,7 +271,7 @@ const AdminDashboard = () => {
   const handleDeleteProduct = async (productId) => {
     const confirmResult = window.confirm('Are you sure you want to delete this product? This action is permanent and cannot be undone.');
     if (!confirmResult) return;
-    
+
     try {
       await api.delete(`/products/${productId}`);
       toast.success('Product deleted successfully');
@@ -292,6 +292,16 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleTogglePayment = async (orderId) => {
+    try {
+      await api.put(`/orders/${orderId}/pay`);
+      toast.success('Payment status updated successfully');
+      fetchOrders();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to update payment status');
+    }
+  };
+
   const handleAddCategory = async (categoryName) => {
     if (!categoryName.trim()) {
       toast.warning('Please enter a category name');
@@ -304,7 +314,7 @@ const AdminDashboard = () => {
   const handleDeleteCategory = async (categoryName) => {
     const confirmResult = window.confirm(`Are you sure you want to delete the category "${categoryName}"? This action cannot be undone.`);
     if (!confirmResult) return;
-    
+
     setCategories(categories.filter(c => c !== categoryName));
     toast.success(`Category "${categoryName}" deleted`);
   };
@@ -340,10 +350,9 @@ const AdminDashboard = () => {
                     onClick={() => setActiveTab(tab.id)}
                     className={`
                       relative px-4 py-2.5 rounded-md font-medium text-sm transition-all duration-200 flex-shrink-0
-                      ${
-                        activeTab === tab.id
-                          ? 'bg-white text-blue-600 shadow-sm border border-gray-200'
-                          : 'text-gray-600 hover:bg-white hover:text-blue-500 hover:shadow-sm'
+                      ${activeTab === tab.id
+                        ? 'bg-white text-blue-600 shadow-sm border border-gray-200'
+                        : 'text-gray-600 hover:bg-white hover:text-blue-500 hover:shadow-sm'
                       }
                       focus:outline-none focus:ring-2 focus:ring-blue-200 focus:ring-offset-1
                     `}
@@ -411,6 +420,7 @@ const AdminDashboard = () => {
                     onUpdateStatus={handleUpdateOrderStatus}
                     searchTerm={searchTerm}
                     onSearchChange={setSearchTerm}
+                    onTogglePayment={handleTogglePayment}
                   />
                 )}
                 {activeTab === 'categories' && (
@@ -583,9 +593,9 @@ const VendorCard = ({ vendor, onApprove, onDeny, isPending, onToggleStatus, onDe
         <div className="flex items-center space-x-3">
           <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold overflow-hidden">
             {vendor.avatar ? (
-              <img 
-                src={vendor.avatar} 
-                alt={vendor.name} 
+              <img
+                src={vendor.avatar}
+                alt={vendor.name}
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -606,21 +616,19 @@ const VendorCard = ({ vendor, onApprove, onDeny, isPending, onToggleStatus, onDe
           <p className="text-sm text-gray-600 mt-3">{vendor.vendorInfo.businessDescription}</p>
         )}
         <div className="flex items-center space-x-4 mt-3">
-          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-            vendor.vendorInfo?.isVerified
-              ? 'bg-green-100 text-green-800'
-              : 'bg-orange-100 text-orange-800'
-          }`}>
+          <span className={`px-3 py-1 rounded-full text-xs font-medium ${vendor.vendorInfo?.isVerified
+            ? 'bg-green-100 text-green-800'
+            : 'bg-orange-100 text-orange-800'
+            }`}>
             {vendor.vendorInfo?.isVerified ? 'Verified' : 'Pending Verification'}
           </span>
-          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-            vendor.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-          }`}>
+          <span className={`px-3 py-1 rounded-full text-xs font-medium ${vendor.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+            }`}>
             {vendor.isActive ? 'Active' : 'Inactive'}
           </span>
         </div>
       </div>
-      
+
       {/* Action Buttons */}
       <div className="flex flex-col space-y-2 ml-4">
         {isPending ? (
@@ -642,8 +650,7 @@ const VendorCard = ({ vendor, onApprove, onDeny, isPending, onToggleStatus, onDe
           <>
             <button
               onClick={onToggleStatus}
-              className={`px-4 py-2 rounded-lg text-white transition-colors w-full text-sm ${
-                vendor.isActive ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-green-600 hover:bg-green-700'}`
+              className={`px-4 py-2 rounded-lg text-white transition-colors w-full text-sm ${vendor.isActive ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-green-600 hover:bg-green-700'}`
               }
             >
               {vendor.isActive ? 'Deactivate' : 'Activate'}
@@ -705,9 +712,9 @@ const UsersTab = ({ users, onToggleStatus, onDelete, searchTerm, onSearchChange 
                   <div className="flex items-center">
                     <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold mr-3 overflow-hidden">
                       {user.avatar ? (
-                        <img 
-                          src={user.avatar} 
-                          alt={user.name} 
+                        <img
+                          src={user.avatar}
+                          alt={user.name}
                           className="w-full h-full object-cover"
                           onError={(e) => {
                             e.target.onerror = null;
@@ -729,9 +736,8 @@ const UsersTab = ({ users, onToggleStatus, onDelete, searchTerm, onSearchChange 
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  }`}>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }`}>
                     {user.isActive ? 'Active' : 'Inactive'}
                   </span>
                 </td>
@@ -740,11 +746,10 @@ const UsersTab = ({ users, onToggleStatus, onDelete, searchTerm, onSearchChange 
                     {user.role !== 'admin' && (
                       <button
                         onClick={() => onToggleStatus(user._id, user.isActive)}
-                        className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                          user.isActive
-                            ? 'bg-red-100 text-red-800 hover:bg-red-200'
-                            : 'bg-green-100 text-green-800 hover:bg-green-200'
-                        }`}
+                        className={`px-3 py-1 rounded text-sm font-medium transition-colors ${user.isActive
+                          ? 'bg-red-100 text-red-800 hover:bg-red-200'
+                          : 'bg-green-100 text-green-800 hover:bg-green-200'
+                          }`}
                       >
                         {user.isActive ? 'Deactivate' : 'Activate'}
                       </button>
@@ -812,9 +817,8 @@ const ProductsTab = ({ products, onToggleStatus, onDelete, searchTerm, onSearchC
                   <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">
                     {product.category}
                   </span>
-                  <span className={`px-2 py-1 rounded text-xs font-medium ${
-                    product.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  }`}>
+                  <span className={`px-2 py-1 rounded text-xs font-medium ${product.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }`}>
                     {product.isActive ? 'Active' : 'Inactive'}
                   </span>
                 </div>
@@ -822,11 +826,10 @@ const ProductsTab = ({ products, onToggleStatus, onDelete, searchTerm, onSearchC
               <div className="flex space-x-2">
                 <button
                   onClick={() => onToggleStatus(product._id, product.isActive)}
-                  className={`px-3 py-1 rounded text-sm ${
-                    product.isActive
-                      ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
-                      : 'bg-green-100 text-green-800 hover:bg-green-200'
-                  }`}
+                  className={`px-3 py-1 rounded text-sm ${product.isActive
+                    ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
+                    : 'bg-green-100 text-green-800 hover:bg-green-200'
+                    }`}
                 >
                   {product.isActive ? 'Deactivate' : 'Activate'}
                 </button>
@@ -846,7 +849,7 @@ const ProductsTab = ({ products, onToggleStatus, onDelete, searchTerm, onSearchC
 };
 
 // Orders Tab Component
-const OrdersTab = ({ orders, onUpdateStatus, searchTerm, onSearchChange }) => {
+const OrdersTab = ({ orders, onUpdateStatus, searchTerm, onSearchChange, onTogglePayment }) => {
   const filteredOrders = orders.filter(o =>
     o._id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     o.user?.name?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -884,26 +887,51 @@ const OrdersTab = ({ orders, onUpdateStatus, searchTerm, onSearchChange }) => {
                   {order.user?.name} - {new Date(order.createdAt).toLocaleDateString()}
                 </p>
                 <p className="text-sm text-gray-600">Total: {formatPricePKR(order.totalPrice)}</p>
+
+                {/* Shipping Info Display */}
+                {order.status === 'shipped' && order.trackingNumber && (
+                  <div className="mt-2 text-sm bg-gray-50 p-2 rounded">
+                    <p><span className="font-semibold">Courier:</span> {order.courier}</p>
+                    <p><span className="font-semibold">Tracking:</span> {order.trackingNumber}</p>
+                    <p><span className="font-semibold">Est. Delivery:</span> {new Date(order.estimatedDeliveryDate).toLocaleDateString()}</p>
+                  </div>
+                )}
               </div>
-              <div className="flex items-center space-x-3">
-                <select
-                  value={order.status}
-                  onChange={(e) => onUpdateStatus(order._id, e.target.value)}
-                  className="px-3 py-1 border rounded-lg text-sm"
-                >
-                  <option value="pending">Pending</option>
-                  <option value="processing">Processing</option>
-                  <option value="shipped">Shipped</option>
-                  <option value="delivered">Delivered</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  order.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                  order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                  'bg-yellow-100 text-yellow-800'
-                }`}>
-                  {order.status}
-                </span>
+
+              <div className="flex flex-col items-end space-y-2">
+                <div className="flex items-center space-x-3">
+                  <select
+                    value={order.status}
+                    onChange={(e) => onUpdateStatus(order._id, e.target.value)}
+                    className="px-3 py-1 border rounded-lg text-sm"
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="accepted">Accepted</option>
+                    <option value="processing">Processing</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${order.status === 'delivered' ? 'bg-green-100 text-green-800' :
+                    order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                      'bg-yellow-100 text-yellow-800'
+                    }`}>
+                    {order.status}
+                  </span>
+                </div>
+
+                {/* Admin Payment Toggle */}
+                {order.status === 'delivered' && (
+                  <button
+                    onClick={() => onTogglePayment(order._id)}
+                    className={`px-3 py-1 text-xs rounded font-semibold ${order.isPaid
+                      ? 'bg-green-100 text-green-800 border border-green-200'
+                      : 'bg-red-100 text-red-800 border border-red-200'
+                      }`}
+                  >
+                    {order.isPaid ? 'Paid' : 'Mark as Paid'}
+                  </button>
+                )}
               </div>
             </div>
             <div className="border-t pt-3">
@@ -954,7 +982,7 @@ const CategoriesTab = () => {
   const handleCreateCategory = async (e) => {
     e.preventDefault();
     if (!newCategory.name.trim()) return;
-    
+
     try {
       setIsSubmitting(true);
       await api.post('/categories', newCategory);
@@ -972,7 +1000,7 @@ const CategoriesTab = () => {
   const handleUpdateCategory = async (e) => {
     e.preventDefault();
     if (!editingCategory?.name?.trim()) return;
-    
+
     try {
       setIsSubmitting(true);
       await api.put(`/categories/${editingCategory._id}`, {
@@ -999,11 +1027,11 @@ const CategoriesTab = () => {
     try {
       setLoading(true);
       const response = await api.delete(`/categories/${categoryId}`);
-      
+
       if (response.data.success) {
         // Show success message
         alert(response.data.message || 'Category deleted successfully');
-        
+
         // Refresh the categories list
         await fetchCategories();
       } else {
@@ -1012,13 +1040,13 @@ const CategoriesTab = () => {
       }
     } catch (error) {
       console.error('Error deleting category:', error);
-      
+
       // More detailed error handling
-      const errorMessage = error.response?.data?.message || 
-                         (error.response?.status === 400 
-                           ? 'Cannot delete category with active products. Please deactivate or move the products first.'
-                           : 'Failed to delete category. Please try again.');
-      
+      const errorMessage = error.response?.data?.message ||
+        (error.response?.status === 400
+          ? 'Cannot delete category with active products. Please deactivate or move the products first.'
+          : 'Failed to delete category. Please try again.');
+
       alert(errorMessage);
     } finally {
       setLoading(false);
@@ -1069,8 +1097,8 @@ const CategoriesTab = () => {
         <form onSubmit={editingCategory ? handleUpdateCategory : handleCreateCategory} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label 
-                htmlFor="category-name" 
+              <label
+                htmlFor="category-name"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
                 Category Name *
@@ -1092,8 +1120,8 @@ const CategoriesTab = () => {
               />
             </div>
             <div>
-              <label 
-                htmlFor="category-description" 
+              <label
+                htmlFor="category-description"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
                 Description
@@ -1114,10 +1142,10 @@ const CategoriesTab = () => {
               />
             </div>
           </div>
-          
+
           {editingCategory && (
             <div className="flex items-center">
-<input
+              <input
                 type="checkbox"
                 id="isActive"
                 name="isActive"
@@ -1136,7 +1164,7 @@ const CategoriesTab = () => {
               </label>
             </div>
           )}
-          
+
           <div className="flex space-x-3 pt-2">
             <button
               type="submit"
@@ -1163,7 +1191,7 @@ const CategoriesTab = () => {
         <div className="px-6 py-4 border-b">
           <h3 className="text-lg font-semibold">All Categories</h3>
         </div>
-        
+
         {categories.length === 0 ? (
           <div className="p-6 text-center text-gray-500">
             No categories found. Add a new category to get started.
@@ -1190,11 +1218,10 @@ const CategoriesTab = () => {
                 <div className="flex space-x-2">
                   <button
                     onClick={() => toggleCategoryStatus(category)}
-                    className={`px-3 py-1 text-sm rounded-md ${
-                      category.isActive
-                        ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
-                        : 'bg-green-100 text-green-700 hover:bg-green-200'
-                    }`}
+                    className={`px-3 py-1 text-sm rounded-md ${category.isActive
+                      ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+                      : 'bg-green-100 text-green-700 hover:bg-green-200'
+                      }`}
                   >
                     {category.isActive ? 'Deactivate' : 'Activate'}
                   </button>
@@ -1238,7 +1265,7 @@ const ReportsTab = ({ orders, products, users }) => {
   const fetchReportData = async () => {
     try {
       setReportData(prev => ({ ...prev, loading: true }));
-      
+
       const [salesRes, productsRes, categoriesRes] = await Promise.all([
         api.get(`/reports/sales?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`),
         api.get(`/reports/top-products?limit=5&startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`),
@@ -1246,12 +1273,12 @@ const ReportsTab = ({ orders, products, users }) => {
       ]);
 
       // Process top products data
-      const productsData = Array.isArray(productsRes.data?.data) 
-        ? productsRes.data.data 
-        : Array.isArray(productsRes.data) 
-          ? productsRes.data 
+      const productsData = Array.isArray(productsRes.data?.data)
+        ? productsRes.data.data
+        : Array.isArray(productsRes.data)
+          ? productsRes.data
           : [];
-      
+
       const processedTopProducts = productsData.map(product => ({
         id: product._id || product.id || Math.random().toString(36).substr(2, 9),
         name: product.name || 'Unknown Product',
@@ -1262,12 +1289,12 @@ const ReportsTab = ({ orders, products, users }) => {
       }));
 
       // Process categories data
-      const categoriesData = Array.isArray(categoriesRes.data?.data) 
-        ? categoriesRes.data.data 
-        : Array.isArray(categoriesRes.data) 
-          ? categoriesRes.data 
+      const categoriesData = Array.isArray(categoriesRes.data?.data)
+        ? categoriesRes.data.data
+        : Array.isArray(categoriesRes.data)
+          ? categoriesRes.data
           : [];
-      
+
       const processedCategories = categoriesData
         .filter(cat => cat && cat.name)
         .map(cat => ({
@@ -1319,7 +1346,7 @@ const ReportsTab = ({ orders, products, users }) => {
         `/reports/export?type=sales&startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`,
         { responseType: 'blob' }
       );
-      
+
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
@@ -1333,16 +1360,16 @@ const ReportsTab = ({ orders, products, users }) => {
   };
 
   const { sales = {}, topProducts = [], topCategories = [], loading } = reportData;
-  
+
   // Handle both old and new sales data structure
-  const salesByDate = sales.salesByDate || 
-    (sales.salesTrend ? 
+  const salesByDate = sales.salesByDate ||
+    (sales.salesTrend ?
       sales.salesTrend.reduce((acc, { date, sales }) => {
         acc[date] = sales;
         return acc;
-      }, {}) : 
+      }, {}) :
       {});
-      
+
   const salesDates = Object.keys(salesByDate);
   const salesData = Object.values(salesByDate);
 
@@ -1486,11 +1513,11 @@ const ReportsTab = ({ orders, products, users }) => {
                           const quantitySold = Number(product.quantitySold || product.totalQuantity || 0);
                           const price = Number(product.price || 0);
                           const totalSales = Number(product.totalSales || (price * quantitySold) || 0);
-                          
+
                           return {
                             ...product,
-                            displayName: product.name && product.name.length > 20 
-                              ? `${product.name.substring(0, 20)}...` 
+                            displayName: product.name && product.name.length > 20
+                              ? `${product.name.substring(0, 20)}...`
                               : product.name || 'Unknown Product',
                             quantitySold,
                             price,
@@ -1502,17 +1529,17 @@ const ReportsTab = ({ orders, products, users }) => {
                         barGap={4}
                       >
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis 
-                          type="number" 
+                        <XAxis
+                          type="number"
                           tickFormatter={(value) => Math.round(value)}
                         />
-                        <YAxis 
-                          type="category" 
-                          dataKey="displayName" 
+                        <YAxis
+                          type="category"
+                          dataKey="displayName"
                           width={200}
                           tick={{ fontSize: 12 }}
                         />
-                        <Tooltip 
+                        <Tooltip
                           labelFormatter={(label) => `Product: ${label}`}
                           contentStyle={{
                             padding: '10px',
@@ -1527,18 +1554,18 @@ const ReportsTab = ({ orders, products, users }) => {
                           }}
                           content={({ active, payload, label }) => {
                             if (!active || !payload || !payload.length) return null;
-                            
+
                             // Get the first payload item which contains all the data
                             const data = payload[0].payload;
-                            
+
                             return (
                               <div className="space-y-1 bg-white">
                                 <div className="font-semibold">Product: {label}</div>
                                 <div className="flex items-center">
                                   <span className="inline-block w-3 h-3 mr-2 bg-green-500 rounded-full"></span>
-                                  <span>Product Price (PKR): {Number(data.price || 0).toLocaleString(undefined, { 
-                                    minimumFractionDigits: 2, 
-                                    maximumFractionDigits: 2 
+                                  <span>Product Price (PKR): {Number(data.price || 0).toLocaleString(undefined, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
                                   })}</span>
                                 </div>
                                 <div className="flex items-center">
@@ -1547,16 +1574,16 @@ const ReportsTab = ({ orders, products, users }) => {
                                 </div>
                                 <div className="flex items-center">
                                   <span className="inline-block w-3 h-3 mr-2 bg-purple-500 rounded-full"></span>
-                                  <span>Total Sale (PKR): {(Number(data.price || 0) * Number(data.quantitySold || 0)).toLocaleString(undefined, { 
-                                    minimumFractionDigits: 2, 
-                                    maximumFractionDigits: 2 
+                                  <span>Total Sale (PKR): {(Number(data.price || 0) * Number(data.quantitySold || 0)).toLocaleString(undefined, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
                                   })}</span>
                                 </div>
                               </div>
                             );
                           }}
-                        />                     
-                        <Legend 
+                        />
+                        <Legend
                           formatter={(value) => {
                             let color;
                             if (value === 'Product Price (PKR)') {
@@ -1570,26 +1597,26 @@ const ReportsTab = ({ orders, products, users }) => {
                           }}
                         />
                         {/* Price Bar (Green) */}
-                        <Bar 
-                          dataKey="price" 
-                          name="Product Price (PKR)" 
-                          fill="#10b981" 
+                        <Bar
+                          dataKey="price"
+                          name="Product Price (PKR)"
+                          fill="#10b981"
                           radius={[0, 4, 4, 0]}
                           barSize={20}
                         />
                         {/* Total Sales Bar (Purple) */}
-                        <Bar 
-                          dataKey="totalSales" 
-                          name="Total Sales (PKR)" 
-                          fill="#8b5cf6" 
+                        <Bar
+                          dataKey="totalSales"
+                          name="Total Sales (PKR)"
+                          fill="#8b5cf6"
                           radius={[0, 4, 4, 0]}
                           barSize={20}
                         />
                         {/* Quantity Sold Bar (Blue) */}
-                        <Bar 
-                          dataKey="quantitySold" 
-                          name="Quantity Sold" 
-                          fill="#3b82f6" 
+                        <Bar
+                          dataKey="quantitySold"
+                          name="Quantity Sold"
+                          fill="#3b82f6"
                           radius={[0, 4, 4, 0]}
                           barSize={20}
                         />
@@ -1672,10 +1699,10 @@ const ReportsTab = ({ orders, products, users }) => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                              ${order.status === 'delivered' ? 'bg-green-100 text-green-800' : 
+                              ${order.status === 'delivered' ? 'bg-green-100 text-green-800' :
                                 order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
-                                order.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
-                                'bg-gray-100 text-gray-800'}`}>
+                                  order.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
+                                    'bg-gray-100 text-gray-800'}`}>
                               {order.status}
                             </span>
                           </td>

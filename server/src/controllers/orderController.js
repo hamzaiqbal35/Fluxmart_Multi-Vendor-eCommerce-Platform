@@ -25,10 +25,10 @@ const createOrder = async (req, res) => {
 
     for (const item of cart.items) {
       const product = await Product.findById(item.product._id);
-      
+
       if (product.stock < item.quantity) {
-        return res.status(400).json({ 
-          message: `Insufficient stock for ${product.name}` 
+        return res.status(400).json({
+          message: `Insufficient stock for ${product.name}`
         });
       }
 
@@ -121,11 +121,11 @@ const getMyOrders = async (req, res) => {
 const updateOrder = async (req, res) => {
   const isProduction = process.env.NODE_ENV === 'production';
   const session = isProduction ? await mongoose.startSession() : null;
-  
+
   if (isProduction) {
     session.startTransaction();
   }
-  
+
   try {
     const { id } = req.params;
     const { orderItems } = req.body;
@@ -215,7 +215,7 @@ const updateOrder = async (req, res) => {
           session.endSession();
         }
         return res.status(400).json({
-          message: `Not enough stock for ${product.name}. Available: ${product.stock}` 
+          message: `Not enough stock for ${product.name}. Available: ${product.stock}`
         });
       }
 
@@ -227,7 +227,7 @@ const updateOrder = async (req, res) => {
         return res.status(400).json({ message: 'Item quantity must be at least 1' });
       }
 
-      // Store the update - FIXED: No negation needed
+      // Store the update
       if (quantityChange !== 0) {
         productUpdates.push({
           productId: product._id,
@@ -323,20 +323,21 @@ const cancelOrder = async (req, res) => {
     // Check ownership or admin status
     const isAdmin = req.user.role === 'admin';
     const isOrderOwner = order.user.toString() === userId.toString();
-    
+
     if (!isOrderOwner && !isAdmin) {
       return res.status(403).json({ message: 'Not authorized to cancel this order' });
     }
 
-    // Only pending or processing can be cancelled
-    if (!['pending', 'processing'].includes(order.status)) {
+    // Customer can only cancel if PENDING
+    if (isOrderOwner && !isAdmin && order.status !== 'pending') {
       return res.status(400).json({
-        message: `Cannot cancel ${order.status} orders.`
+        message: 'Customers can only cancel pending orders. Please contact support.'
       });
     }
 
-    if (order.isShipped) {
-      return res.status(400).json({ message: 'Cannot cancel shipped orders' });
+    // Admin/Vendor can cancel if not shipped/delivered
+    if (['shipped', 'delivered'].includes(order.status)) {
+      return res.status(400).json({ message: 'Cannot cancel shipped or delivered orders' });
     }
 
     // Restore stock
@@ -391,9 +392,9 @@ const getOrder = async (req, res) => {
 
     if (!order) return res.status(404).json({ message: 'Order not found' });
 
-    if (order.user._id.toString() !== req.user._id.toString() && 
-        req.user.role !== 'admin' && 
-        !order.orderItems.some(item => item.vendor._id.toString() === req.user._id.toString())) {
+    if (order.user._id.toString() !== req.user._id.toString() &&
+      req.user.role !== 'admin' &&
+      !order.orderItems.some(item => item.vendor._id.toString() === req.user._id.toString())) {
       return res.status(403).json({ message: 'Not authorized' });
     }
 
@@ -411,7 +412,7 @@ const getOrder = async (req, res) => {
 // @access  Private (admin/vendor)
 const updateOrderStatus = async (req, res) => {
   try {
-    const { status, trackingNumber } = req.body;
+    const { status, trackingNumber, courier, estimatedDeliveryDate } = req.body;
     const order = await Order.findById(req.params.id)
       .populate('user', 'email name');
 
@@ -419,8 +420,8 @@ const updateOrderStatus = async (req, res) => {
 
     // Check if order is cancelled
     if (order.status === 'cancelled') {
-      return res.status(400).json({ 
-        message: 'Cannot update status of cancelled orders' 
+      return res.status(400).json({
+        message: 'Cannot update status of cancelled orders'
       });
     }
 
@@ -433,47 +434,58 @@ const updateOrderStatus = async (req, res) => {
     }
 
     // Validate status transitions
-    const validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+    const validStatuses = ['pending', 'accepted', 'processing', 'shipped', 'delivered', 'cancelled'];
     if (!validStatuses.includes(status)) {
-      return res.status(400).json({ 
-        message: `Invalid status. Must be one of: ${validStatuses.join(', ')}` 
+      return res.status(400).json({
+        message: `Invalid status. Must be one of: ${validStatuses.join(', ')}`
       });
+    }
+
+    // Validate shipping info if status is shipped
+    if (status === 'shipped') {
+      if (!trackingNumber || !courier || !estimatedDeliveryDate) {
+        // Only enforce if it's a new shipment or updating details
+        // But for simplicity, let's enforce it if they are transitioning to shipped
+        if (order.status !== 'shipped') {
+          return res.status(400).json({
+            message: 'Tracking number, courier, and estimated delivery date are required for shipped status'
+          });
+        }
+      }
+      if (trackingNumber) order.trackingNumber = trackingNumber;
+      if (courier) order.courier = courier;
+      if (estimatedDeliveryDate) order.estimatedDeliveryDate = estimatedDeliveryDate;
     }
 
     // Update status
     order.status = status;
     if (trackingNumber) order.trackingNumber = trackingNumber;
-    
+
     // CRITICAL: Synchronize all status-related fields based on the main status
     switch (status) {
       case 'pending':
-        order.isShipped = false;
-        order.shippedAt = null;
-        order.isDelivered = false;
-        order.deliveredAt = null;
-        break;
-        
+      case 'accepted':
       case 'processing':
         order.isShipped = false;
         order.shippedAt = null;
         order.isDelivered = false;
         order.deliveredAt = null;
         break;
-        
+
       case 'shipped':
         order.isShipped = true;
         if (!order.shippedAt) order.shippedAt = new Date();
         order.isDelivered = false;
         order.deliveredAt = null;
         break;
-        
+
       case 'delivered':
         order.isShipped = true;
         if (!order.shippedAt) order.shippedAt = new Date();
         order.isDelivered = true;
         if (!order.deliveredAt) order.deliveredAt = new Date();
         break;
-        
+
       case 'cancelled':
         // Restore product stock when order is cancelled
         for (const item of order.orderItems) {
@@ -546,17 +558,20 @@ const updateOrderPaymentToggle = async (req, res) => {
 
     // Prevent payment status changes on cancelled orders
     if (order.status === 'cancelled') {
-      return res.status(400).json({ 
-        message: 'Cannot update payment status of cancelled orders' 
+      return res.status(400).json({
+        message: 'Cannot update payment status of cancelled orders'
       });
     }
 
-    const isVendor = order.orderItems.some(
-      (item) => item.vendor.toString() === req.user._id.toString()
-    );
+    // Payment can only be marked after Delivered
+    if (order.status !== 'delivered') {
+      return res.status(400).json({
+        message: 'Payment can only be marked after order is delivered'
+      });
+    }
 
-    if (req.user.role !== 'admin' && !isVendor) {
-      return res.status(401).json({ message: 'Not authorized to update payment' });
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Only admin can mark payment' });
     }
 
     order.isPaid = !order.isPaid;
@@ -586,30 +601,31 @@ const fixOrderConsistency = async (req, res) => {
 
     // Fix inconsistencies based on the main status field
     const originalStatus = { ...order.toObject() };
-    
+
     switch (order.status) {
       case 'pending':
+      case 'accepted':
       case 'processing':
         order.isShipped = false;
         order.shippedAt = null;
         order.isDelivered = false;
         order.deliveredAt = null;
         break;
-        
+
       case 'shipped':
         order.isShipped = true;
         if (!order.shippedAt) order.shippedAt = new Date();
         order.isDelivered = false;
         order.deliveredAt = null;
         break;
-        
+
       case 'delivered':
         order.isShipped = true;
         if (!order.shippedAt) order.shippedAt = new Date();
         order.isDelivered = true;
         if (!order.deliveredAt) order.deliveredAt = new Date();
         break;
-        
+
       case 'cancelled':
         order.isShipped = false;
         order.shippedAt = null;

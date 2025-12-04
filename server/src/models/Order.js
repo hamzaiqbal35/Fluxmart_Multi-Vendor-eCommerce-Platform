@@ -83,10 +83,12 @@ const orderSchema = new mongoose.Schema({
   deliveredAt: Date,
   status: {
     type: String,
-    enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'],
+    enum: ['pending', 'accepted', 'processing', 'shipped', 'delivered', 'cancelled'],
     default: 'pending'
   },
   trackingNumber: String,
+  courier: String,
+  estimatedDeliveryDate: Date,
 
   // vendor cancel request / admin review
   vendorCancelRequested: {
@@ -121,7 +123,7 @@ const orderSchema = new mongoose.Schema({
 // MIDDLEWARE TO MAINTAIN STATUS CONSISTENCY
 // ============================================
 
-orderSchema.pre('save', function(next) {
+orderSchema.pre('save', function (next) {
   // Only run this logic if status was modified
   if (!this.isModified('status')) {
     return next();
@@ -132,6 +134,7 @@ orderSchema.pre('save', function(next) {
   // Synchronize all status-related fields based on the main status
   switch (this.status) {
     case 'pending':
+    case 'accepted':
     case 'processing':
       // Order is not yet shipped or delivered
       this.isShipped = false;
@@ -168,7 +171,7 @@ orderSchema.pre('save', function(next) {
       this.shippedAt = null;
       this.isDelivered = false;
       this.deliveredAt = null;
-      
+
       // Mark as unpaid and refunded if it was paid
       if (this.isPaid) {
         this.isRefunded = true;
@@ -178,7 +181,7 @@ orderSchema.pre('save', function(next) {
       }
       this.isPaid = false;
       this.paidAt = null;
-      
+
       // Set cancellation timestamp
       if (!this.cancelledAt) {
         this.cancelledAt = new Date();
@@ -193,7 +196,7 @@ orderSchema.pre('save', function(next) {
  * Pre-save validation hook to prevent invalid status transitions
  * This adds an extra layer of protection against inconsistent updates
  */
-orderSchema.pre('save', function(next) {
+orderSchema.pre('save', function (next) {
   // Skip validation for new documents
   if (this.isNew) {
     return next();
@@ -222,23 +225,24 @@ orderSchema.pre('save', function(next) {
 /**
  * Instance method to check if order can be modified
  */
-orderSchema.methods.canBeModified = function() {
+orderSchema.methods.canBeModified = function () {
   return this.status === 'pending' && !this.isPaid && !this.isShipped;
 };
 
 /**
  * Instance method to check if order can be cancelled
  */
-orderSchema.methods.canBeCancelled = function() {
-  return ['pending', 'processing'].includes(this.status) && !this.isShipped;
+orderSchema.methods.canBeCancelled = function () {
+  return ['pending', 'processing', 'accepted'].includes(this.status) && !this.isShipped;
 };
 
 /**
  * Instance method to get human-readable status
  */
-orderSchema.methods.getStatusDisplay = function() {
+orderSchema.methods.getStatusDisplay = function () {
   const statusMap = {
     pending: 'Pending',
+    accepted: 'Accepted',
     processing: 'Processing',
     shipped: 'Shipped',
     delivered: 'Delivered',
@@ -250,7 +254,7 @@ orderSchema.methods.getStatusDisplay = function() {
 /**
  * Static method to find inconsistent orders (for debugging/admin tools)
  */
-orderSchema.statics.findInconsistent = async function() {
+orderSchema.statics.findInconsistent = async function () {
   const allOrders = await this.find({});
   const inconsistent = [];
 

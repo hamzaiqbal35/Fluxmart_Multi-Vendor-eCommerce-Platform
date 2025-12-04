@@ -39,7 +39,7 @@ const OrderDetails = () => {
   };
 
   const canCancelOrder = (status) => {
-    return ['pending', 'processing'].includes(status);
+    return ['pending', 'accepted'].includes(status);
   };
 
   const handleCancelOrder = async () => {
@@ -101,6 +101,7 @@ const OrderDetails = () => {
   const getStatusColor = (status) => {
     const colors = {
       pending: 'bg-yellow-100 text-yellow-800',
+      accepted: 'bg-indigo-100 text-indigo-800',
       processing: 'bg-blue-100 text-blue-800',
       shipped: 'bg-purple-100 text-purple-800',
       delivered: 'bg-green-100 text-green-800',
@@ -140,7 +141,7 @@ const OrderDetails = () => {
               Placed on {order.createdAt ? new Date(order.createdAt).toLocaleString() : 'N/A'}
             </p>
           </div>
-          <span 
+          <span
             className={`mt-2 md:mt-0 px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(order.status)}`}
             aria-label={`Order status: ${order.status || 'unknown'}`}
           >
@@ -190,9 +191,26 @@ const OrderDetails = () => {
         </div>
 
         {order.trackingNumber && (
-          <div className="mt-6 p-4 bg-gray-50 rounded">
-            <p className="font-semibold mb-1">Tracking Number</p>
-            <p className="text-lg font-mono">{order.trackingNumber}</p>
+          <div className="mt-6 p-4 bg-gray-50 rounded border border-gray-200">
+            <h3 className="font-semibold text-lg mb-2">🚚 Shipping Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <p className="text-sm text-gray-600">Courier</p>
+                <p className="font-medium">{order.courier || 'N/A'}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Tracking Number</p>
+                <p className="font-mono font-medium">{order.trackingNumber}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Estimated Delivery</p>
+                <p className="font-medium">
+                  {order.estimatedDeliveryDate
+                    ? new Date(order.estimatedDeliveryDate).toLocaleDateString()
+                    : 'N/A'}
+                </p>
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -225,7 +243,7 @@ const OrderDetails = () => {
                         )}
                       </div>
                     </div>
-                    
+
                     {editingItems ? (
                       <div className="flex items-center space-x-2">
                         <div className="flex items-center space-x-1 border rounded">
@@ -343,7 +361,7 @@ const OrderDetails = () => {
             <p className="text-gray-600 mb-4">
               Are you sure you want to cancel this order? A full refund will be processed within 5-7 business days.
             </p>
-            
+
             <div className="mb-4">
               <label className="block font-semibold mb-2">Cancellation Reason</label>
               <textarea

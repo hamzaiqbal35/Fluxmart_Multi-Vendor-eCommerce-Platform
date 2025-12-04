@@ -10,6 +10,15 @@ const VendorDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('products');
 
+  // Shipping Modal State
+  const [showShippingModal, setShowShippingModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [shippingDetails, setShippingDetails] = useState({
+    trackingNumber: '',
+    courier: '',
+    estimatedDeliveryDate: ''
+  });
+
   useEffect(() => {
     fetchProducts();
     fetchOrders();
@@ -19,7 +28,7 @@ const VendorDashboard = () => {
     try {
       const res = await api.get('/products');
       const currentUser = JSON.parse(localStorage.getItem('user'));
-      const vendorProducts = res.data.products.filter(p => 
+      const vendorProducts = res.data.products.filter(p =>
         p.vendor._id === currentUser.id || p.vendor._id === currentUser._id
       );
       setProducts(vendorProducts);
@@ -39,13 +48,28 @@ const VendorDashboard = () => {
     }
   };
 
-  // UPDATED: Payment toggle function
-  const handleTogglePayment = async (orderId) => {
+  const handleUpdateStatus = async (orderId, newStatus, details = {}) => {
     try {
-      const { data } = await api.put(`/orders/${orderId}/pay`);
-      setOrders(orders.map((order) => (order._id === data._id ? data : order)));
+      const payload = { status: newStatus, ...details };
+      const { data } = await api.put(`/orders/${orderId}/status`, payload);
+      setOrders(orders.map((order) => (order._id === data.order._id ? data.order : order)));
+      setShowShippingModal(false);
+      setShippingDetails({ trackingNumber: '', courier: '', estimatedDeliveryDate: '' });
     } catch (error) {
-      console.error('Error toggling payment:', error);
+      console.error('Error updating status:', error);
+      alert(error.response?.data?.message || 'Failed to update status');
+    }
+  };
+
+  const openShippingModal = (order) => {
+    setSelectedOrder(order);
+    setShowShippingModal(true);
+  };
+
+  const handleShippingSubmit = (e) => {
+    e.preventDefault();
+    if (selectedOrder) {
+      handleUpdateStatus(selectedOrder._id, 'shipped', shippingDetails);
     }
   };
 
@@ -156,9 +180,19 @@ const VendorDashboard = () => {
                           {new Date(order.createdAt).toLocaleDateString()}
                         </p>
                       </div>
-                      <span className={`px-3 py-1 rounded-full text-sm ${order.status === 'delivered' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                        {order.status}
-                      </span>
+                      <div className="flex flex-col items-end">
+                        <span className={`px-3 py-1 rounded-full text-sm mb-2 ${order.status === 'delivered' ? 'bg-green-100 text-green-800' :
+                            order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                              'bg-yellow-100 text-yellow-800'
+                          }`}>
+                          {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                        </span>
+                        {order.isPaid && (
+                          <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                            Paid
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     <div className="border-t pt-4">
@@ -175,25 +209,49 @@ const VendorDashboard = () => {
                       </div>
 
                       <div className="flex justify-end mt-4 space-x-2">
-
-                        {order.status !== 'cancelled' && (
+                        {/* Status Action Buttons */}
+                        {order.status === 'pending' && (
                           <button
-                            onClick={() => handleTogglePayment(order._id)}
-                            className={`px-3 py-2 text-white rounded text-sm font-semibold 
-                              ${order.isPaid ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}`}
+                            onClick={() => handleUpdateStatus(order._id, 'accepted')}
+                            className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-semibold"
                           >
-                            {order.isPaid ? 'Mark as Unpaid' : 'Mark as Paid'}
+                            Accept Order
                           </button>
                         )}
 
+                        {order.status === 'accepted' && (
+                          <button
+                            onClick={() => handleUpdateStatus(order._id, 'processing')}
+                            className="px-3 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm font-semibold"
+                          >
+                            Process Order
+                          </button>
+                        )}
+
+                        {order.status === 'processing' && (
+                          <button
+                            onClick={() => openShippingModal(order)}
+                            className="px-3 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm font-semibold"
+                          >
+                            Ship Order
+                          </button>
+                        )}
+
+                        {order.status === 'shipped' && (
+                          <button
+                            onClick={() => handleUpdateStatus(order._id, 'delivered')}
+                            className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm font-semibold"
+                          >
+                            Mark Delivered
+                          </button>
+                        )}
 
                         <Link
                           to={`/orders/${order._id}`}
-                          className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-semibold"
+                          className="px-3 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 text-sm font-semibold"
                         >
-                          View Order
+                          View Details
                         </Link>
-
                       </div>
                     </div>
                   </div>
@@ -202,6 +260,64 @@ const VendorDashboard = () => {
             ) : (
               <p className="text-gray-600">No orders yet.</p>
             )}
+          </div>
+        )}
+
+        {/* Shipping Modal */}
+        {showShippingModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg p-6 max-w-md w-full">
+              <h3 className="text-xl font-bold mb-4">Shipping Details</h3>
+              <form onSubmit={handleShippingSubmit}>
+                <div className="mb-4">
+                  <label className="block text-gray-700 mb-2">Courier Service</label>
+                  <input
+                    type="text"
+                    required
+                    className="w-full border rounded px-3 py-2"
+                    value={shippingDetails.courier}
+                    onChange={(e) => setShippingDetails({ ...shippingDetails, courier: e.target.value })}
+                    placeholder="e.g. TCS, Leopard, DHL"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-gray-700 mb-2">Tracking Number</label>
+                  <input
+                    type="text"
+                    required
+                    className="w-full border rounded px-3 py-2"
+                    value={shippingDetails.trackingNumber}
+                    onChange={(e) => setShippingDetails({ ...shippingDetails, trackingNumber: e.target.value })}
+                    placeholder="Enter tracking number"
+                  />
+                </div>
+                <div className="mb-6">
+                  <label className="block text-gray-700 mb-2">Estimated Delivery Date</label>
+                  <input
+                    type="date"
+                    required
+                    className="w-full border rounded px-3 py-2"
+                    value={shippingDetails.estimatedDeliveryDate}
+                    onChange={(e) => setShippingDetails({ ...shippingDetails, estimatedDeliveryDate: e.target.value })}
+                  />
+                </div>
+                <div className="flex justify-end space-x-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowShippingModal(false)}
+                    className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  >
+                    Confirm Shipment
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         )}
       </div>
