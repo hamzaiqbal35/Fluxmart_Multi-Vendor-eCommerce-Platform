@@ -1,21 +1,21 @@
 <div align="center">
+    <img src="client\public\images\logo.png" alt="Fluxmart Logo" width="120" />
+    <h1>Fluxmart</h1>
+    <p>A comprehensive, scalable, and modern solution for multi-vendor commerce.</p>
 
-# 🛍️ Multi-Vendor eCommerce Platform
+    [![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)](https://react.dev/)
+    [![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+    [![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+    [![Node.js](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+    [![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB)](https://expressjs.com/)
+    [![MongoDB](https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+    [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
 
-[![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)](https://react.dev/)
-[![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Node.js](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
-[![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB)](https://expressjs.com/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
+    <p align="center">
+        Empowering vendors to sell and customers to shop in a seamless, unified ecosystem.
+    </p>
 
-<p align="center">
-  <b>A comprehensive, scalable, and modern solution for multi-vendor commerce.</b><br />
-  Empowering vendors to sell and customers to shop in a seamless, unified ecosystem.
-</p>
-
-[View Demo](#) • [Documentation](#documentation) • [Report Bug](https://github.com/hamzaiqbal35/ApexcifyTechnologys_Multi-Vendor-eCommerce-Platform/issues) • [Request Feature](https://github.com/hamzaiqbal35/ApexcifyTechnologys_Multi-Vendor-eCommerce-Platform/issues)
+    [Documentation](#documentation) • [Report Bug](https://github.com/hamzaiqbal35/ApexcifyTechnologys_Multi-Vendor-eCommerce-Platform/issues) • [Request Feature](https://github.com/hamzaiqbal35/ApexcifyTechnologys_Multi-Vendor-eCommerce-Platform/issues)
 
 </div>
 
@@ -30,7 +30,6 @@
 - [Getting Started](#-getting-started)
 - [API Reference](#-api-reference)
 - [Future Roadmap](#-future-roadmap)
-- [Contributing](#-contributing)
 - [License](#-license)
 - [Contact](#-contact)
 
