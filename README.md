@@ -1,281 +1,231 @@
+<div align="center">
+
 # 🛍️ Multi-Vendor eCommerce Platform
 
-<div align="center">
-  <p>
-    <a href="#">
-      <img src="https://img.shields.io/badge/version-1.0.0-blue" alt="Version">
-    </a>
-    <a href="#">
-      <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
-    </a>
-    <a href="#">
-      <img src="https://img.shields.io/badge/PRs-welcome-brightgreen" alt="PRs Welcome">
-    </a>
-  </p>
+[![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)](https://react.dev/)
+[![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Node.js](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB)](https://expressjs.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
+
+<p align="center">
+  <b>A comprehensive, scalable, and modern solution for multi-vendor commerce.</b><br />
+  Empowering vendors to sell and customers to shop in a seamless, unified ecosystem.
+</p>
+
+[View Demo](#) • [Documentation](#documentation) • [Report Bug](https://github.com/hamzaiqbal35/ApexcifyTechnologys_Multi-Vendor-eCommerce-Platform/issues) • [Request Feature](https://github.com/hamzaiqbal35/ApexcifyTechnologys_Multi-Vendor-eCommerce-Platform/issues)
+
 </div>
-
-A full-featured multi-vendor eCommerce platform that enables vendors to sell their products and customers to browse and purchase items in a seamless shopping experience. Built with modern web technologies for optimal performance and scalability.
-
-## ✨ Features
-
-### 🛒 Core Features
-- **Multi-Vendor Marketplace**: Multiple vendors can sign up and manage their products
-- **User Authentication**: Secure JWT-based authentication for customers, vendors, and admins
-- **Product Management**: Vendors can add, edit, and manage their product listings
-- **Shopping Cart**: Persistent shopping cart with guest checkout support
-- **Order Processing**: Complete order lifecycle management
-- **Reviews & Ratings**: Customers can leave reviews and ratings for products
-- **Admin Dashboard**: Comprehensive admin panel for platform management
-- **Responsive Design**: Fully responsive UI that works on all devices
-
-### 👥 User Roles
-- **Customers**: Browse products, add to cart, place orders, leave reviews
-- **Vendors**: Manage products, view orders, update order status
-- **Administrators**: Manage users, products, orders, and platform settings
-
-## 🚀 Tech Stack
-
-### Frontend
-- **Framework**: React 19
-- **State Management**: React Context API
-- **Styling**: Tailwind CSS
-- **Routing**: React Router
-- **Build Tool**: Vite
-
-### Backend
-- **Runtime**: Node.js
-- **Framework**: Express.js
-- **Database**: MongoDB with Mongoose
-- **Authentication**: JWT
-- **File Upload**: Multer
-- **Email**: Nodemailer
-
-## 🛠️ Project Structure
-
-```
-.
-├── client/                 # Frontend React application
-│   ├── public/             # Static files
-│   └── src/                # Source code
-│       ├── components/     # Reusable UI components
-│       ├── context/        # React context providers
-│       ├── pages/          # Page components
-│       └── utils/          # Utility functions
-│
-└── server/                 # Backend Node.js/Express application
-    ├── config/            # Configuration files
-    ├── controllers/       # Route controllers
-    ├── middleware/        # Custom middleware
-    ├── models/            # Database models
-    ├── routes/            # API routes
-    └── uploads/           # File uploads directory
-```
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js (v18 or higher)
-- MongoDB (v6.0 or higher)
-- npm (v9.0 or higher) or yarn
-
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/hamzaiqbal35/ApexcifyTechnologys_Multi-Vendor-eCommerce-Platform.git
-   git
-   cd "ApexcifyTechnologys_Multi-Vendor eCommerce Platform"
-   ```
-
-2. **Install dependencies**
-   ```bash
-   # Install server dependencies
-   cd server
-   npm install
-   
-   # Install client dependencies
-   cd ../client
-   npm install
-   ```
-
-3. **Environment Setup**
-   - Create `.env` files in both `client` and `server` directories
-   - Use the examples provided in `.env.example` files
-
-4. **Start the development servers**
-   ```bash
-   # In the server directory
-   npm run dev
-   
-   # In a new terminal, from the client directory
-   npm run dev
-   ```
-
-5. **Access the application**
-   - Frontend: http://localhost:5173
-   - Backend API: http://localhost:5000
-   - API Documentation: http://localhost:5000/api-docs (if Swagger is configured)
-
-## 📚 Documentation
-
-- [API Documentation](server/README.md) - Detailed API endpoints and usage
-- [Frontend Documentation](client/README.md) - Frontend architecture and components
-- [Deployment Guide](DEPLOYMENT.md) - Instructions for deploying to production
-
-## 🤝 Contributing
-
-Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 📬 Contact
-
-For any questions or feedback, please reach out to our team at [contact@apexcify.com](mailto:contact@apexcify.com).
 
 ---
 
-<div align="center">
-  Made with ❤️ by Hamza Iqbal
-</div>
+## 📖 Table of Contents
 
-   Start the client (from `client` directory in a new terminal):
-   ```bash
-   npm run dev
-   ```
+- [Overview](#-overview)
+- [Key Features](#-key-features)
+- [Tech Stack](#-tech-stack)
+- [Project Structure](#-project-structure)
+- [Getting Started](#-getting-started)
+- [API Reference](#-api-reference)
+- [Future Roadmap](#-future-roadmap)
+- [Contributing](#-contributing)
+- [License](#-license)
+- [Contact](#-contact)
 
-7. **Access the application**
-   - Frontend: http://localhost:5173
-   - Backend API: http://localhost:5000
+---
 
-## API Endpoints
+## 🔭 Overview
+
+This project is a full-featured **Multi-Vendor eCommerce Platform** designed to bridge the gap between multiple sellers and a unified customer base. Built with performance and scalability in mind, it leverages the latest web technologies to deliver a fast, responsive, and secure shopping experience.
+
+Whether you are a customer looking for products, a vendor managing an inventory, or an administrator overseeing the platform, this solution provides tailored interfaces and robust functionality for all user roles.
+
+---
+
+## ✨ Key Features
+
+### 🛒 For Customers
+- **Seamless Shopping**: Browse products from multiple vendors in one place.
+- **Smart Cart**: Persistent shopping cart with guest checkout options.
+- **Secure Reviews**: Verified purchase reviews and 5-star rating system.
+- **Order Tracking**: Real-time updates on order status (Pending, Processing, Shipped, Delivered).
+
+### 🏪 For Vendors
+- **Dashboard**: specialized panel to manage products, inventory, and sales.
+- **Order Management**: View and process orders specific to their products.
+- **Split Orders**: Multi-vendor order support handles split payments and shipping automatically.
+
+### 🛡️ For Administrators
+- **Platform Oversight**: comprehensive dashboard for monitoring users, products, and orders.
+- **User Management**: Tools to suspend, ban, or verify users and vendors.
+- **System Stats**: Real-time analytics on platform performance.
+
+### 🔐 Security & Core
+- **Authentication**: Secure JWT-based auth with role-based access control (RBAC).
+- **Data Integrity**: Robust input validation and secure database transactions.
+- **Responsive**: Mobile-first design ensures compatibility across all devices.
+
+---
+
+## 💻 Tech Stack
+
+### Frontend Client
+| Tech | Description |
+| --- | --- |
+| **React 19** | The latest library for building interactive UIs. |
+| **Vite** | Next-generation frontend tooling for lightning-fast builds. |
+| **Tailwind CSS** | Utility-first CSS framework for rapid UI development. |
+| **Recharts** | Composable charting library for dashboard analytics. |
+| **Axios** | Promise-based HTTP client for API requests. |
+
+### Backend API
+| Tech | Description |
+| --- | --- |
+| **Node.js** | JavaScript runtime built on Chrome's V8 engine. |
+| **Express.js** | Minimalist web framework for Node.js. |
+| **MongoDB** | NoSQL database for flexible data schemas. |
+| **Mongoose** | ODM library for MongoDB and Node.js. |
+| **Multer / Cloudinary** | Handling file uploads and cloud storage. |
+| **Nodemailer** | Module for sending transactional emails. |
+
+---
+
+## 📂 Project Structure
+
+```bash
+root/
+├── client/                 # 🎨 Frontend (React + Vite)
+│   ├── src/
+│   │   ├── components/     # Reusable UI blocks
+│   │   ├── content/        # Context Providers (Auth, Cart, etc.)
+│   │   ├── pages/          # Application Routes/Views
+│   │   └── utils/          # Helpers & Constants
+│   └── ...
+│
+├── server/                 # ⚙️ Backend (Node + Express)
+│   ├── src/
+│   │   ├── config/         # Environment & DB Configs
+│   │   ├── controllers/    # Request Handlers
+│   │   ├── middleware/     # Auth & Validation Middleware
+│   │   ├── models/         # Mongoose Schemas
+│   │   └── routes/         # API Endpoint Definitions
+│   └── ...
+│
+└── README.md               # 📄 You are here!
+```
+
+---
+
+## 🚀 Getting Started
+
+Follow these steps to set up the project locally.
+
+### Prerequisites
+
+Ensure you have the following installed:
+- **Node.js** (v18+)
+- **npm** (v9+) or **yarn**
+- **MongoDB** (Local instance or Atlas URI)
+
+### Installation
+
+1.  **Clone the Repository**
+    ```bash
+    git clone https://github.com/hamzaiqbal35/ApexcifyTechnologys_Multi-Vendor-eCommerce-Platform.git
+    cd "ApexcifyTechnologys_Multi-Vendor eCommerce Platform"
+    ```
+
+2.  **Install Dependencies**
+    ```bash
+    # Install Backend Dependencies
+    cd server
+    npm install
+
+    # Install Frontend Dependencies
+    cd ../client
+    npm install
+    ```
+
+3.  **Environment Configuration**
+    Create a `.env` file in both `client/` and `server/` directories using the provided `.env.example` as a template.
+
+    **Server `.env` example:**
+    ```env
+    PORT=5000
+    MONGO_URI=your_mongodb_connection_string
+    JWT_SECRET=your_jwt_secret
+    ```
+
+4.  **Launch Development Servers**
+    Open two terminal windows:
+
+    **Terminal 1 (Backend)**
+    ```bash
+    cd server
+    npm run dev
+    ```
+
+    **Terminal 2 (Frontend)**
+    ```bash
+    cd client
+    npm run dev
+    ```
+
+5.  **Access the App**
+    - Application: `http://localhost:5173`
+    - API Server: `http://localhost:5000`
+
+---
+
+## 🔌 API Reference
 
 ### Authentication
-- `POST /api/auth/register` - Register a new user
-- `POST /api/auth/login` - Login user
-- `GET /api/auth/me` - Get current user (protected)
+- `POST /api/auth/register` - Create a new account
+- `POST /api/auth/login` - Sign in and receive JWT
+- `GET /api/auth/me` - Retrieve current user profile
 
 ### Products
-- `GET /api/products` - Get all products (with filters)
-- `GET /api/products/:id` - Get single product
-- `POST /api/products` - Create product (vendor/admin only)
-- `PUT /api/products/:id` - Update product (vendor/admin only)
-- `DELETE /api/products/:id` - Delete product (vendor/admin only)
-- `POST /api/products/:id/reviews` - Add review (protected)
-
-### Cart
-- `GET /api/cart` - Get user cart (protected)
-- `POST /api/cart` - Add item to cart (protected)
-- `PUT /api/cart/:itemId` - Update cart item (protected)
-- `DELETE /api/cart/:itemId` - Remove cart item (protected)
-- `DELETE /api/cart` - Clear cart (protected)
+- `GET /api/products` - List all products with pagination/filtering
+- `GET /api/products/:id` - Get product details
+- `POST /api/products` - (Vendor) Create new product
+- `PUT /api/products/:id` - (Vendor) Update product details
 
 ### Orders
-- `POST /api/orders` - Create order (protected)
-- `GET /api/orders/my-orders` - Get user orders (protected)
-- `GET /api/orders/all` - Get all orders (vendor/admin only)
-- `GET /api/orders/:id` - Get single order (protected)
-- `PUT /api/orders/:id/status` - Update order status (vendor/admin only)
+- `POST /api/orders` - Place a new order
+- `GET /api/orders/my-orders` - History of customer orders
+- `GET /api/orders/all` - (Vendor/Admin) View all relevant orders
+- `PUT /api/orders/:id/status` - (Vendor/Admin) Update order fulfillment status
 
-### Users
-- `GET /api/users` - Get all users (admin only)
-- `GET /api/users/:id` - Get user by ID (protected)
-- `PUT /api/users/:id` - Update user (protected)
-- `DELETE /api/users/:id` - Delete user (admin only)
+*(See `server/README.md` for the full API documentation)*
 
-## Project Structure
+---
 
-```
-├── client/                 # React frontend
-│   ├── src/
-│   │   ├── components/    # Reusable components
-│   │   ├── context/       # Context providers (Auth, Cart)
-│   │   ├── pages/         # Page components
-│   │   ├── utils/         # Utility functions
-│   │   └── App.jsx        # Main app component
-│   └── package.json
-│
-├── server/                 # Node.js backend
-│   ├── src/
-│   │   ├── config/        # Configuration files
-│   │   ├── controllers/   # Route controllers
-│   │   ├── middleware/    # Custom middleware
-│   │   ├── models/        # MongoDB models
-│   │   ├── routes/        # API routes
-│   │   ├── services/      # Business logic services
-│   │   ├── utils/         # Utility functions
-│   │   ├── app.js         # Express app setup
-│   │   └── server.js      # Server entry point
-│   └── package.json
-│
-└── README.md
-```
+## 🛣️ Future Roadmap
 
-## Features in Detail
+- [ ] 💳 **Online Payment Integration** - Secure payment gateway processing.
+- [ ] 🔍 **Advanced Search** - ElasticSearch integration for better discovery.
+- [ ]  wishlist **Wishlist** - Save items for later.
+- [ ] 📊 **Vendor Analytics** - Detailed sales graphs and reports.
+- [ ] 🔔 **Real-time Notifications** - Socket.io integration for instant updates.
+- [ ] 🌐 **Localization** - Multi-language support (i18n).
 
-### Shopping Cart
-- Add/remove products
-- Update quantities
-- Real-time cart total calculation
-- Persistent cart (stored in database)
+---
 
-### Product Management
-- Vendors can create, update, and delete their products
-- Product images, descriptions, pricing, and stock management
-- Category-based filtering
-- Search functionality
+## 📄 License
 
-### Order Processing
-- Multi-vendor order splitting
-- Order status tracking (pending, processing, shipped, delivered)
-- Tracking number support
-- Email notifications on order status changes
+Distributed under the MIT License. See `LICENSE` for more information.
 
-### Reviews & Ratings
-- Customers can leave reviews with ratings (1-5 stars)
-- Average rating calculation
-- Review display on product pages
+---
 
-### Admin Dashboard
-- View all users, products, and orders
-- Activate/deactivate user accounts
-- System statistics overview
+## 📬 Contact
 
-### Vendor Dashboard
-- Manage products
-- View orders for their products
-- Product inventory management
+**Hamza Iqbal** - [hamzaiqbalrajpoot35@gmail.com](mailto:hamzaiqbalrajpoot35@gmail.com)
 
-## Email Notifications
+Project Link: [https://github.com/hamzaiqbal35/ApexcifyTechnologys_Multi-Vendor-eCommerce-Platform](https://github.com/hamzaiqbal35/ApexcifyTechnologys_Multi-Vendor-eCommerce-Platform)
 
-Email notifications are optional. To enable:
-1. Configure SMTP settings in `server/.env`
-2. For Gmail, you'll need to generate an App Password
-3. If not configured, emails will be logged to console
-
-## Security Features
-
-- JWT-based authentication
-- Password hashing with bcrypt
-- Protected routes (role-based access control)
-- Input validation
-- CORS configuration
-
-## Future Enhancements
-
-- Payment gateway integration
-- Advanced search and filters
-- Wishlist feature
-- Product recommendations
-- Vendor analytics
-- Real-time notifications
-- Multi-language support
-
-## License
-
-MIT
-
-## Support
-
-For issues and questions, please open an issue in the repository
+<div align="center">
+  <br />
+  <sub>Made with ❤️ by Hamza Iqbal</sub>
+</div>
