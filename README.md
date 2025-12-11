@@ -1,5 +1,5 @@
 <div align="center">
-<img src="client\public\images\logo.png" alt="Fluxmart Logo" width="120" />
+<img src="client/public/images/logo.png" alt="Fluxmart Logo" width="120" />
 <h1>Fluxmart</h1>
 <h2>Multi-Vendor eCommerce Platform</h2>
 
@@ -53,12 +53,12 @@ Whether you are a customer looking for products, a vendor managing an inventory,
 - **Order Tracking**: Real-time updates on order status (Pending, Processing, Shipped, Delivered).
 
 ### 🏪 For Vendors
-- **Dashboard**: specialized panel to manage products, inventory, and sales.
+- **Dashboard**: Specialized panel to manage products, inventory, and sales.
 - **Order Management**: View and process orders specific to their products.
 - **Split Orders**: Multi-vendor order support handles split payments and shipping automatically.
 
 ### 🛡️ For Administrators
-- **Platform Oversight**: comprehensive dashboard for monitoring users, products, and orders.
+- **Platform Oversight**: Comprehensive dashboard for monitoring users, products, and orders.
 - **User Management**: Tools to suspend, ban, or verify users and vendors.
 - **System Stats**: Real-time analytics on platform performance.
 
@@ -99,7 +99,7 @@ root/
 ├── client/                 # 🎨 Frontend (React + Vite)
 │   ├── src/
 │   │   ├── components/     # Reusable UI blocks
-│   │   ├── content/        # Context Providers (Auth, Cart, etc.)
+│   │   ├── context/        # Context Providers (Auth, Cart, etc.)
 │   │   ├── pages/          # Application Routes/Views
 │   │   └── utils/          # Helpers & Constants
 │   └── ...
@@ -206,7 +206,7 @@ Ensure you have the following installed:
 
 - [ ] 💳 **Online Payment Integration** - Secure payment gateway processing.
 - [ ] 🔍 **Advanced Search** - ElasticSearch integration for better discovery.
-- [ ]  wishlist **Wishlist** - Save items for later.
+- [ ] ❤️ **Wishlist** - Save items for later.
 - [ ] 📊 **Vendor Analytics** - Detailed sales graphs and reports.
 - [ ] 🔔 **Real-time Notifications** - Socket.io integration for instant updates.
 - [ ] 🌐 **Localization** - Multi-language support (i18n).
@@ -221,9 +221,20 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## 📬 Contact
 
-**Hamza Iqbal** - [hamzaiqbalrajpoot35@gmail.com](mailto:hamzaiqbalrajpoot35@gmail.com)
+<div align="center">
 
-Project Link: [https://github.com/hamzaiqbal35/ApexcifyTechnologys_Multi-Vendor-eCommerce-Platform](https://github.com/hamzaiqbal35/ApexcifyTechnologys_Multi-Vendor-eCommerce-Platform)
+### Hamza Iqbal
+
+[![Email](https://img.shields.io/badge/Gmail-hamzaiqbalrajpoot35%40gmail.com-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:hamzaiqbalrajpoot35@gmail.com)
+[![GitHub](https://img.shields.io/badge/GitHub-hamzaiqbal35-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/hamzaiqbal35)
+
+<br />
+
+**Project Link**
+<br />
+[ApexcifyTechnologys_Multi-Vendor-eCommerce-Platform](https://github.com/hamzaiqbal35/ApexcifyTechnologys_Multi-Vendor-eCommerce-Platform)
+
+</div>
 
 <div align="center">
   <br />
