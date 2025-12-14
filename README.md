@@ -133,8 +133,8 @@ Ensure you have the following installed:
 
 1.  **Clone the Repository**
     ```bash
-    git clone https://github.com/hamzaiqbal35/ApexcifyTechnologys_Multi-Vendor-eCommerce-Platform.git
-    cd "ApexcifyTechnologys_Multi-Vendor eCommerce Platform"
+    git clone https://github.com/hamzaiqbal35/Fluxmart_Multi-Vendor-eCommerce-Platform.git
+    cd "Fluxmart_Multi-Vendor eCommerce Platform"
     ```
 
 2.  **Install Dependencies**
