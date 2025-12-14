@@ -16,7 +16,7 @@
   Empowering vendors to sell and customers to shop in a seamless, unified ecosystem.
 </p>
 
-[View Demo](#) • [Documentation](#documentation) • [Report Bug](https://github.com/hamzaiqbal35/ApexcifyTechnologys_Multi-Vendor-eCommerce-Platform/issues) • [Request Feature](https://github.com/hamzaiqbal35/ApexcifyTechnologys_Multi-Vendor-eCommerce-Platform/issues)
+[View Demo](#) • [Documentation](#documentation) • [Report Bug](https://github.com/hamzaiqbal35/Fluxmart_Multi-Vendor-eCommerce-Platform/issues) • [Request Feature](https://github.com/hamzaiqbal35/Fluxmart_Multi-Vendor-eCommerce-Platform/issues)
 
 </div>
 
@@ -232,7 +232,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 **Project Link**
 <br />
-[ApexcifyTechnologys_Multi-Vendor-eCommerce-Platform](https://github.com/hamzaiqbal35/ApexcifyTechnologys_Multi-Vendor-eCommerce-Platform)
+[Fluxmart_Multi-Vendor-eCommerce-Platform](https://github.com/hamzaiqbal35/Fluxmart_Multi-Vendor-eCommerce-Platform)
 
 </div>
 
